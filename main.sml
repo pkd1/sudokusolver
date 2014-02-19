@@ -12,7 +12,11 @@ with
                     (fn x => x+1)))))
         fun debug (Board (_, vec)) = vec
         (* local *)
-        fun posToIndex (boardside : int) (x : int) (y : int) : int = (y * boardside) + (x mod boardside)
+        fun posToIndex (boardside : int) (x : int) (y : int) : int =
+            if 0 <= x andalso x < boardside andalso
+               0 <= y andalso y < boardside then
+                (y * boardside) + x
+            else raise Subscript
         fun getCell (Board (boardside, vec) : board) (x : int) (y : int) =
                 Vector.sub(vec, posToIndex boardside x y)
         fun setCell (Board (boardside, vec) : board) (x : int) (y : int) (possibilities : int list) =
