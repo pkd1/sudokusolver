@@ -1,31 +1,35 @@
 use "main";
-local
 
-    val empty3 = emptyBoard(3)
-
-    val set222 = setCell empty3 2 2 ([2])
-
-in
-
-fun id x = x
-
-fun test 0 = true
-  | test 1 = debug(empty3) = Vector.fromList[[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3],[1, 2, 3], [1, 2, 3], [1, 2, 3]]
-
-  | test 2 = debug(setCell empty3 0 0 ([2])) = Vector.fromList[[2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3],[1, 2, 3], [1, 2, 3], [1, 2, 3]]
- | test 3 = getCell empty3 0 0 = [1, 2, 3]
-
- | test 4 = debug(set222) = Vector.fromList[[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3],[1, 2, 3], [1, 2, 3], [ 2, 3], [2]]
-
- | test 5 = getCell set222 2 2 = [2]
-
- | test 6 = ((getCell set222 3 2; false) handle Subscript => true)
-
- | test 7 = ((getCell set222 2 3; false) handle Subscript => true)
-
- | test _ = raise Domain
-
-val tests = List.tabulate (8, (fn x => (x,test x)))
-val allTests = List.all (fn (_,b) => b) tests
-
-end;
+fun test () =
+    let
+        val empty3 = emptyBoard(3)
+        val set222 = setCell empty3 2 2 ([2])
+        val tests = [
+            (1, debug(empty3) = Vector.fromList[[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3],[1, 2, 3], [1, 2, 3], [1, 2, 3]]),
+            
+            (2, debug(setCell empty3 0 0 ([2])) = Vector.fromList[[2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3],[1, 2, 3], [1, 2, 3], [1, 2, 3]]),
+            
+            (3, getCell empty3 0 0 = [1, 2, 3]),
+            
+            (4, debug(set222) = Vector.fromList[[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3],[1, 2, 3], [1, 2, 3], [1, 2, 3], [2]]),
+            
+            (5, getCell set222 2 2 = [2]),
+            
+            (6, (getCell set222 3 2; false) handle Subscript => true),
+            
+            (7, (getCell set222 2 3; false) handle Subscript => true),
+                
+            (8, getCell (emptyBoard(9)) 8 8 = [1,2,3,4,5,6,7,8,9]),
+            
+            (9, (getCell (emptyBoard(9)) 9 0; false) handle Subscript => true),
+            (10, (getCell (emptyBoard(9)) 0 9; false) handle Subscript => true)
+        ]
+        val allPassed = List.all (fn (_,b) => b) tests
+        val failedTests = List.foldl (fn ((x,b),s) => if not b then s^(Int.toString(x))^", " else s) "" tests
+    in
+        if allPassed then
+            print "SUCCESS!\n"
+        else
+            print ("FAILED TESTS: " ^ failedTests ^ "\n")
+    end;
+test();
