@@ -28,8 +28,8 @@ fun test () =
         val failedTests = List.foldl (fn ((x,b),s) => if not b then s^(Int.toString(x))^", " else s) "" tests
     in
         if allPassed then
-            print "SUCCESS!\n"
+            print "\nSUCCESS!\n\n"
         else
-            print ("FAILED TESTS: " ^ failedTests ^ "\n")
+            print ("\nFAILED TESTS: " ^ failedTests ^ "\n\n")
     end;
 test();
