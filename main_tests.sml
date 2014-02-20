@@ -7,22 +7,25 @@ local
 
 in
 
-val test1 = debug(empty3) = Vector.fromList[[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3],[1, 2, 3], [1, 2, 3], [1, 2, 3]]
+fun id x = x
 
-val test2 = debug(setCell empty3 0 0 ([2])) = Vector.fromList[[2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3],[1, 2, 3], [1, 2, 3], [1, 2, 3]]
-val test3 = getCell empty3 0 0 = [1, 2, 3]
+fun test 0 = true
+  | test 1 = debug(empty3) = Vector.fromList[[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3],[1, 2, 3], [1, 2, 3], [1, 2, 3]]
 
-val test4 = debug(set222) = Vector.fromList[[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3],[1, 2, 3], [1, 2, 3], [1, 2, 3], [2]]
+  | test 2 = debug(setCell empty3 0 0 ([2])) = Vector.fromList[[2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3],[1, 2, 3], [1, 2, 3], [1, 2, 3]]
+ | test 3 = getCell empty3 0 0 = [1, 2, 3]
 
-val test5 = getCell set222 2 2 = [2]
+ | test 4 = debug(set222) = Vector.fromList[[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3],[1, 2, 3], [1, 2, 3], [ 2, 3], [2]]
 
-val test6 = (getCell set222 3 2; false)
-            handle Subscript => true
+ | test 5 = getCell set222 2 2 = [2]
 
-val test7 = (getCell set222 2 3; false)
-            handle Subscript => true
+ | test 6 = ((getCell set222 3 2; false) handle Subscript => true)
 
+ | test 7 = ((getCell set222 2 3; false) handle Subscript => true)
 
+ | test _ = raise Domain
 
+val tests = List.tabulate (8, (fn x => (x,test x)))
+val allTests = List.all (fn (_,b) => b) tests
 
 end;
