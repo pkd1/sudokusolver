@@ -65,6 +65,16 @@ fun readLines fname =
 *)
 fun readNumbersFromLine line = List.map (fn s => getOpt (Int.fromString s,~1)) (String.fields (fn c => c = #",") line)
 
+(* readBoard stringlist
+   TYPE: string list -> board
+   PRE:  stringlist is a string representation of a board where every line
+         is a string with integers or empty strings seperated by commas.
+         number of commas on every line must be equal and
+         length of stringlist must be equal to commas in one line plus one.
+   POST: 
+   EXAMPLE: 
+*)
+fun readBoard stringlist = raise Fail "Not Implemented"
 
 (* readBoardsFile boardsFile
    TYPE: string -> board list
