@@ -56,14 +56,16 @@ fun readLines fname =
   end;
 
 (* readNumbersFromLine line
-   TYPE: string -> int list
+   TYPE: string -> int option list
    PRE:  line is a string with integers or empty strings or white space
          characters seperated by commas.
-   POST: a list with the integers in the same position as in line, with
-         empty strings represented by ~1.
-   EXAMPLE: readNumbersFromLine "1, ,0,4,,3," = [1, ~1, 0, 4, ~1, 3, ~1]
+   POST: a list with SOME int:s where int is the same integer in the same 
+         position as in line, with empty strings or whitespaces between
+         commas represented by NONE.
+   EXAMPLE: readNumbersFromLine "1, ,0,4,,3," =
+            [SOME 1, NONE, SOME 0, SOME 4, NONE, SOME 3, NONE]
 *)
-fun readNumbersFromLine line = List.map (fn s => getOpt (Int.fromString s,~1)) (String.fields (fn c => c = #",") line)
+fun readNumbersFromLine line = List.map Int.fromString (String.fields (fn c => c = #",") line)
 
 (* readBoard stringlist
    TYPE: string list -> board
