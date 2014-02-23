@@ -31,6 +31,31 @@ with
         (* end *)
 end
 
+(* readLines fname
+   TYPE: string -> string list
+   PRE: fname must be the name of an existing (readable) file
+   POST: a list of the lines that comprise the file fname
+   Taken from 29-Side-Effects-and-IO.sml
+ *)
+fun readLines fname =
+  let
+    open TextIO
+    (* readLinesAux istrm
+       TYPE: instream -> string list
+       PRE: true
+       POST: a list of the lines in istrm
+       SIDE-EFFECTS: closes istrm
+     *)
+    (* VARIANT: remaining lines in istrm *)
+    fun readLinesAux istrm =
+      case inputLine istrm of
+        NONE => (closeIn istrm; [])
+      | SOME line => line :: readLinesAux istrm
+  in
+    readLinesAux (openIn fname)
+  end;
+
+
 (* funktionsnamn argument
    TYPE: 
    PRE:  
