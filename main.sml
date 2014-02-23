@@ -55,13 +55,13 @@ fun readLines fname =
     readLinesAux (openIn fname)
   end;
 
-
 (* readNumbersFromLine line
    TYPE: string -> int list
-   PRE:  a string with integers or empty strings seperated by commas.
+   PRE:  line is a string with integers or empty strings or white space
+         characters seperated by commas.
    POST: a list with the integers in the same position as in line, with
          empty strings represented by ~1.
-   EXAMPLE: readNumbersFromLine "1,2,0,4,,3," = [1, 2, 0, 4, ~1, 3, ~1]
+   EXAMPLE: readNumbersFromLine "1, ,0,4,,3," = [1, ~1, 0, 4, ~1, 3, ~1]
 *)
 fun readNumbersFromLine line = List.map (fn s => getOpt (Int.fromString s,~1)) (String.fields (fn c => c = #",") line)
 
