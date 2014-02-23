@@ -55,6 +55,17 @@ fun readLines fname =
     readLinesAux (openIn fname)
   end;
 
+(* readBoardFile filename
+   TYPE: string -> board list
+   PRE:  filename is a valid path to a valid readable boardfile.
+   POST: a list containing the boards from the file filename
+   EXAMPLE: readBoardFile "example.board" = Board ?
+   EXCEPTIONS: raises:
+     MalformattedBoardFile - if board file malformatted,
+     FileNotFound          - if file not found.
+*)
+fun readFile file = raise Fail "Not implemented."
+
 
 (* funktionsnamn argument
    TYPE: 
