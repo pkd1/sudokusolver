@@ -31,6 +31,11 @@ with
         (* end *)
 end
 
-(* 
-   
+(* funktionsnamn argument
+   TYPE: 
+   PRE:  
+   POST: 
+   EXAMPLE: 
+   SIDE-EFFECTS: 
+   EXCEPTIONS: 
 *)
