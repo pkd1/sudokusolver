@@ -69,12 +69,15 @@ fun readNumbersFromLine line = List.map Int.fromString (String.fields (fn c => c
 
 (* readBoard stringlist
    TYPE: string list -> board
-   PRE:  stringlist is a string representation of a board where every line
-         is a string with integers or empty strings seperated by commas.
-         number of commas on every line must be equal and
-         length of stringlist must be equal to commas in one line plus one.
-   POST: 
-   EXAMPLE: 
+   PRE:  stringlist is a string representation of a board where every element
+         is a string with integers, empty strings or white space characters
+         seperated by commas.
+         The number of commas in every element of stringlist must be one less
+         then the length of stringlist.
+   POST: a board with stringlist read in.
+   EXAMPLE: readBoard ["2,3,4,1","4,1,2,3","3,4,1,2","1,2,3,4"] = Board
+   EXCEPTIONS: raises:
+      MalformattedBoard - if stringlist is malformatted.
 *)
 fun readBoard stringlist = raise Fail "Not Implemented"
 
