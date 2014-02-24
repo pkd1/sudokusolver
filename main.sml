@@ -15,7 +15,15 @@ with
         fun blockposToIndex (boardside : int) (block : int) (pos : int) : int =
             if 0 <= block andalso block < boardside andalso
                0 <= pos andalso pos < boardside then
-                (block div 3) * boardside * 3 + ((block mod 3) * (boardside div 3)) + (pos div 3) * boardside + (pos mod 3)
+                (let
+                    val sq = trunc (Math.sqrt (real boardside))
+                    val sqrtSide = if sq*sq = boardside then sq else 1
+                in
+                    (block div sqrtSide) * boardside * sqrtSide
+                    + ((block mod sqrtSide) * sqrtSide)
+                    + (pos div sqrtSide) * boardside
+                    + (pos mod sqrtSide)
+                end)
             else raise Subscript
         fun xyToIndex (boardside : int) (x : int) (y : int) : int =
             if 0 <= x andalso x < boardside andalso
