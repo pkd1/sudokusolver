@@ -87,8 +87,8 @@ fun readBoard stringlist = raise Fail "Not Implemented"
    POST: a list containing the boards from the boardsFile
    EXAMPLE: readBoardsFile "example.boards" = [Board ?, ...]
    EXCEPTIONS: raises:
-     MalformattedBoardsFile - if boardsFile malformatted,
-     FileNotFound           - if boardsFile not found.
+     MalformattedBoard - if boardsFile contains malformatted boards,
+     Io                - if boardsFile could not be opened.
 *)
 fun readBoardsFile boardsFile = raise Fail "Not implemented."
 
