@@ -22,10 +22,48 @@ with
                0 <= y andalso y < boardside then
                 (y * boardside) + x
             else raise Subscript
+	fun indexToxy (boardside : int) (index : int) =
+	    if 0 <= index andalso index <= boardside*boardside
+	    then (index mod boardside, index div boardside)
+	    else raise Subscript
+
         fun getCell (Board (boardside, vec) : board) (x : int) (y : int) =
                 Vector.sub(vec, xyToIndex boardside x y)
-        fun setCell (Board (boardside, vec) : board) (x : int) (y : int) (possibilities : int list) =
+
+	exception NotASolution
+
+        fun setCell (Board (boardside, vec) : board) (x : int) (y : int) (num : int) =
             Board( boardside, Vector.update(vec, xyToIndex boardside x y, possibilities ))
+
+	let
+	    val newBoard =
+		Vector.mapi (fn (index, poss) =>
+				let
+				    val (xi, yi) = indexToxy boardside index
+				    val bi = indexToBlock index
+				    val 
+				in
+				    case (xi = x, yi = y, bi = b) of
+					(true,true,_   ) => [num]                     (* The cell being updated *)
+				      | (false,false,false) => Vector.sub(vec, index) (* other block, column and row *)
+				      (* other block, column and row *)
+				      | (_,_,_) => filter (fn x => x <> num) (Vector.sub(vec, index))              
+				end
+	    (* Finds the indexes of interest  *)
+	    fun ioi(v:Vector) = Vector.foldli (fn (i,l,res) => case (l,i=xyToIndex boardsize x y) of 
+							     (a::nil,false) => case Vector.sub(vec,i) of
+										   b::c::t => i::res
+										 | _ => res
+							   | (nil,_) => raise NotASolution (* or something*)
+							   | (_,_)   => res)
+					      [] v
+	in
+	    List.foldl (fn index => ) (* Trasigt... *)
+	    
+	end
+
+
+
 
         (* in *)
         (* end *)
