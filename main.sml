@@ -107,8 +107,12 @@ fun readBoard [] = raise Fail "No data"
      MalformattedBoard - if boardsFile contains malformatted boards,
      Io                - if boardsFile could not be opened.
 *)
-fun readBoardsFile boardsFile = raise Fail "Not implemented."
-
+fun readBoardsFile boardsFile =
+    (fn (b,l) => List.map readBoard (l::b)) (
+        List.foldl
+        (fn ("\n",(buf,sl)) => (sl::buf,[])
+          | (s,(buf,sl)) =>  (buf,s::sl) )
+        ([],[]) (readLines boardsFile))
 
 (* funktionsnamn argument
    TYPE: 
