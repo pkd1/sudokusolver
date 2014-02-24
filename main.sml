@@ -81,7 +81,22 @@ fun readNumbersFromLine line = List.map Int.fromString (String.fields (fn c => c
    EXCEPTIONS: raises:
       MalformattedBoard - if stringlist is malformatted.
 *)
-fun readBoard stringlist = raise Fail "Not Implemented"
+fun readBoard [] = raise Fail "No data"
+  | readBoard stringlist =
+    let
+        val lsl = length stringlist
+        fun readBoardAux ~1 _ = emptyBoard lsl
+          | readBoardAux y (s::xs) =
+             (fn (bb,~1) => bb
+               | _ => raise MalformattedBoard) (* Wrong dim *)
+                 (List.foldr
+                 (fn ( NONE , (b,x)) => (b,x-1)
+                   | (SOME n, (b,x)) => (setCell b x y [n],x-1))
+                 (readBoardAux (y-1) xs,lsl-1) (readNumbersFromLine s))
+            handle Subscript => raise MalformattedBoard (* Wrong dim *)
+    in
+        readBoardAux (lsl-1) stringlist
+    end
 
 (* readBoardsFile boardsFile
    TYPE: string -> board list
