@@ -12,18 +12,30 @@ with
                     (fn x => x+1)))))
         fun debug (Board (_, vec)) = vec
         (* local *)
+        fun boxSide boardside =
+            let
+                val sq = trunc (Math.sqrt (real boardside))
+            in
+                if sq*sq = boardside then sq else 1
+            end
+
+        fun xyToBlock (boardside : int) (x : int) (y : int) =
+            let
+                val bs = boxSide boardside
+            in
+                (y div bs) * bs + x div bs
+            end
         fun blockposToIndex (boardside : int) (block : int) (pos : int) : int =
             if 0 <= block andalso block < boardside andalso
                0 <= pos andalso pos < boardside then
-                (let
-                    val sq = trunc (Math.sqrt (real boardside))
-                    val sqrtSide = if sq*sq = boardside then sq else 1
+                let
+                    val sqrtSide = boxSide boardside
                 in
                     (block div sqrtSide) * boardside * sqrtSide
                     + ((block mod sqrtSide) * sqrtSide)
                     + (pos div sqrtSide) * boardside
                     + (pos mod sqrtSide)
-                end)
+                end
             else raise Subscript
         fun xyToIndex (boardside : int) (x : int) (y : int) : int =
             if 0 <= x andalso x < boardside andalso
