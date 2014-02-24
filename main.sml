@@ -55,6 +55,8 @@ fun readLines fname =
     readLinesAux (openIn fname)
   end;
 
+exception MalformattedBoard
+
 (* readNumbersFromLine line
    TYPE: string -> int option list
    PRE:  line is a string with integers or empty strings or white space
