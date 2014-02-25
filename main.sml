@@ -1,7 +1,7 @@
 
 
-(* REPRESENTATION CONVENTION: 
-   REPRESENTATION INVARIANT:  
+(* REPRESENTATION CONVENTION:
+   REPRESENTATION INVARIANT:
 *)
 
 abstype board = Board of int * int list vector
@@ -119,7 +119,7 @@ exception MalformattedBoard
    TYPE: string -> int option list
    PRE:  line is a string with integers or empty strings or white space
          characters seperated by commas.
-   POST: a list with SOME int:s where int is the same integer in the same 
+   POST: a list with SOME int:s where int is the same integer in the same
          position as in line, with empty strings or whitespaces between
          commas represented by NONE.
    EXAMPLE: readNumbersFromLine "1, ,0,4,,3," =
@@ -173,10 +173,10 @@ fun readBoardsFile boardsFile =
         ([],[]) (readLines boardsFile))
 
 (* funktionsnamn argument
-   TYPE: 
-   PRE:  
-   POST: 
-   EXAMPLE: 
-   SIDE-EFFECTS: 
-   EXCEPTIONS: 
+   TYPE:
+   PRE:
+   POST:
+   EXAMPLE:
+   SIDE-EFFECTS:
+   EXCEPTIONS:
 *)
