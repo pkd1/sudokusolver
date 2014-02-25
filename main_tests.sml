@@ -6,21 +6,21 @@ fun test () =
         val set222 = setCell empty3 2 2 ([2])
         val tests = [
             (1, debug(empty3) = Vector.fromList[[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3],[1, 2, 3], [1, 2, 3], [1, 2, 3]]),
-            
+
             (2, debug(setCell empty3 0 0 ([2])) = Vector.fromList[[2], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3],[1, 2, 3], [1, 2, 3], [1, 2, 3]]),
-            
+
             (3, getCell empty3 0 0 = [1, 2, 3]),
-            
+
             (4, debug(set222) = Vector.fromList[[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3],[1, 2, 3], [1, 2, 3], [1, 2, 3], [2]]),
-            
+
             (5, getCell set222 2 2 = [2]),
-            
+
             (6, (getCell set222 3 2; false) handle Subscript => true),
-            
+
             (7, (getCell set222 2 3; false) handle Subscript => true),
-                
+
             (8, getCell (emptyBoard(9)) 8 8 = [1,2,3,4,5,6,7,8,9]),
-            
+
             (9, (getCell (emptyBoard(9)) 9 0; false) handle Subscript => true),
             (10, (getCell (emptyBoard(9)) 0 9; false) handle Subscript => true)
         ]
