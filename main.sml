@@ -43,7 +43,7 @@ with
                 (y * boardside) + x
             else raise Subscript
 	fun indexToxy (boardside : int) (index : int) =
-	    if 0 <= index andalso index <= boardside*boardside
+	    if 0 <= index andalso index < boardside*boardside
 	    then (index mod boardside, index div boardside)
 	    else raise Subscript
 
