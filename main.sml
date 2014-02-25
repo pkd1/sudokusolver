@@ -53,33 +53,41 @@ with
 	exception NotASolution
 
         fun setCell (Board (boardside, vec) : board) (x : int) (y : int) (num : int) =
-            Board( boardside, Vector.update(vec, xyToIndex boardside x y, possibilities ))
-
 	let
-	    val newBoard =
+	    val newvec =
 		Vector.mapi (fn (index, poss) =>
 				let
 				    val (xi, yi) = indexToxy boardside index
-				    val bi = indexToBlock index
-				    val 
+				    val b = xyToBlock boardside x y
+				    val bi = (case indexToxy boardside index of
+						 (xi,yi) => xyToBlock boardside xi yi)
 				in
 				    case (xi = x, yi = y, bi = b) of
-					(true,true,_   ) => [num]                     (* The cell being updated *)
+					(true,true,_)       => [num]                  (* The cell being updated *)
 				      | (false,false,false) => Vector.sub(vec, index) (* other block, column and row *)
-				      (* other block, column and row *)
-				      | (_,_,_) => filter (fn x => x <> num) (Vector.sub(vec, index))              
-				end
-	    (* Finds the indexes of interest  *)
-	    fun ioi(v:Vector) = Vector.foldli (fn (i,l,res) => case (l,i=xyToIndex boardsize x y) of 
-							     (a::nil,false) => case Vector.sub(vec,i) of
-										   b::c::t => i::res
-										 | _ => res
-							   | (nil,_) => raise NotASolution (* or something*)
-							   | (_,_)   => res)
-					      [] v
+				      (* not the cell being updated but on a common block, column or row. *)
+				      | (_,_,_) => filter (fn x => x <> num) poss
+				end)
+			    vec
+
+	    (* Find the new singleton lists. Panic on nil *)
+	    fun singleton_coordinates (v: int list vector)
+	      = Vector.foldli (fn (i,l,res)
+				  => case (l,i=xyToIndex boardside x y) of
+					 (* In case of a singleton, note the xy-coord and the member... *)
+					 (a::nil,false) => (case Vector.sub(vec,i) of
+								b::c::t => (indexToxy boardside i, a)::res
+							      | _       => res)
+				       (* ...and panic if encountering nil. *)
+				       | (nil,_) => raise NotASolution
+				       | _ => res)
+			      [] v
 	in
-	    List.foldl (fn index => ) (* Trasigt... *)
-	    
+	    (* Update all of the changed positions using setCell to propagate the new restrictions. *)
+	    List.foldl (fn ( ((x,y), a), brd)
+			   => setCell (Board(boardside, newvec)) x y a)
+		       (Board(boardside, newvec))
+		       (singleton_coordinates newvec)
 	end
 
 
