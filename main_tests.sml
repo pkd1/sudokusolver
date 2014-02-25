@@ -3,7 +3,15 @@ use "main";
 fun test () =
     let
         val empty3 = emptyBoard(3)
-        val set222 = setCell empty3 2 2 ([2])
+        val set222 = setCell empty3 2 2 2
+
+        val set4 = setCell
+                       (setCell
+                            (setCell (emptyBoard 4)
+                                     0 0 1)
+                            1 0 2)
+                       2 0 3
+
         val tests = [
             (1, debug(empty3) = Vector.fromList[[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3],[1, 2, 3], [1, 2, 3], [1, 2, 3]]),
 
@@ -22,7 +30,8 @@ fun test () =
             (8, getCell (emptyBoard(9)) 8 8 = [1,2,3,4,5,6,7,8,9]),
 
             (9, (getCell (emptyBoard(9)) 9 0; false) handle Subscript => true),
-            (10, (getCell (emptyBoard(9)) 0 9; false) handle Subscript => true)
+            (10, (getCell (emptyBoard(9)) 0 9; false) handle Subscript => true),
+            (11, getCell set4 3 0 = 4)
         ]
         val allPassed = List.all (fn (_,b) => b) tests
         val failedTests = List.foldl (fn ((x,b),s) => if not b then s^(Int.toString(x))^", " else s) "" tests
