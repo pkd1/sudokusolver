@@ -66,7 +66,7 @@ with
 					(true,true,_)       => [num]                  (* The cell being updated *)
 				      | (false,false,false) => Vector.sub(vec, index) (* other block, column and row *)
 				      (* not the cell being updated but on a common block, column or row. *)
-				      | (_,_,_) => filter (fn x => x <> num) poss
+				      | (_,_,_) => List.filter (fn x => x <> num) poss
 				end)
 			    vec
 
@@ -157,7 +157,7 @@ fun readBoard [] = raise Fail "No data"
                | _ => raise MalformattedBoard) (* Wrong dim *)
                  (List.foldr
                  (fn ( NONE , (b,x)) => (b,x-1)
-                   | (SOME n, (b,x)) => (setCell b x y [n],x-1))
+                   | (SOME n, (b,x)) => (setCell b x y n,x-1))
                  (readBoardAux (y-1) xs,lsl-1) (readNumbersFromLine s))
             handle Subscript => raise MalformattedBoard (* Wrong dim *)
     in
