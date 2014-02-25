@@ -7,9 +7,13 @@
 abstype board = Board of int * int list vector
 with
         fun emptyBoard (boardside : int) =
+            let
+                val l = List.tabulate (boardside, (fn x => x+1))
+            in
             Board (boardside, Vector.tabulate ((boardside*boardside),
-                (fn x => List.tabulate (boardside,
-                    (fn x => x+1)))))
+                (fn _ => l)))
+            end
+
         fun debug (Board (_, vec)) = vec
         (* local *)
         fun boxSide boardside =
