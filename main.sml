@@ -139,6 +139,40 @@ exception MalformattedBoard
 *)
 fun readNumbersFromLine line = List.map Int.fromString (String.fields (fn c => c = #",") line)
 
+fun singeltonToOption [x] = SOME x
+  | singeltonToOption _ = NONE
+
+fun vecToList v = Vector.foldl (fn (e,buf) => e::buf) [] v
+
+fun extract (vec, start, NONE) = vec (* not implemented *)
+  | extract (vec, start, SOME nElements) =
+    let
+        fun toList 0 = []
+          | toList n = (Vector.sub(vec,start+n-1))::(toList (n-1))
+    in
+        (PolyML.print (toList nElements); Vector.fromList(toList nElements))
+    end
+
+(* split l
+   TYPE: a' list -> a' list
+   PRE:  true ??????????????????????????????????????
+   POST: a list split in in several lists of chunkSize elements.
+   VARIANT: length l
+   EXCEPTION: raises:
+      MalformattedBoard - if chunkSize is not a dividier in length l.
+*)
+
+fun split chunkSize [] = []
+  | split chunkSize l = (List.take(l,chunkSize))::
+                         (split chunkSize (List.drop(l,chunkSize))
+                          handle Subscript => raise MalformattedBoard)
+(*
+fun split 0 bs vec = []
+  | split endElement bs vec = (extract(vec, endElement-bs, SOME bs))::(split (endElement-bs) bs vec)
+*)
+fun vecToIntOptionListList bs vec =
+    split bs (vecToList (Vector.map singeltonToOption vec))
+
 (* readBoard stringlist
    TYPE: string list -> board
    PRE:  stringlist is a string representation of a board where every element
