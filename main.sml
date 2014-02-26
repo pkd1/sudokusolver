@@ -163,12 +163,22 @@ fun split chunkSize [] = []
 fun vecToIntOptionListList bs vec =
     split bs (vecToList (Vector.map singeltonToOption vec))
 
+fun vecToListList bs vec = split bs (vecToList vec)
+
+fun listToStringAux buf [] = buf^"]"
+  | listToStringAux buf (e::l) = listToStringAux ((Int.toString e)^", "^buf) l
+
+fun printBoardL b l = List.foldr (fn (y,()) => print ((listToStringAux "" y)^",")
+                                  | ([],()) => print " ,") (print "\n") l
 
 fun printBoardLine b l = List.foldr (fn (SOME y,()) => print ((Int.toString y)^",")
-                                  | (NONE,()) => print " ,") (print "\n")
-                                                                            l
+                                  | (NONE,()) => print " ,") (print "\n") l
+
 fun printBoard b = List.map (printBoardLine b)
                    (rev (vecToIntOptionListList (debugbs b) (debug b)))
+
+fun printBoardLists b = List.map (printBoardL b)
+                   (rev (vecToListList (debugbs b) (debug b)))
 
 (* readBoard stringlist
    TYPE: string list -> board
