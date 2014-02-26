@@ -15,7 +15,7 @@ with
         end
 
     fun debug (Board (_, vec)) = vec
-    (* local *)
+
     fun boxSide boardside =
         let
             val sq = trunc (Math.sqrt (real boardside))
@@ -96,9 +96,6 @@ with
 
 
 
-
-(* in *)
-(* end *)
 end
 
 (* readLines fname
