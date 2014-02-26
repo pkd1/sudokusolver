@@ -15,6 +15,7 @@ with
         end
 
     fun debug (Board (_, vec)) = vec
+    fun debugbs (Board(bs,_)) = bs
 
     fun boxSide boardside =
         let
@@ -157,13 +158,17 @@ fun vecToList v = Vector.foldl (fn (e,buf) => e::buf) [] v
 fun split chunkSize [] = []
   | split chunkSize l = (List.take(l,chunkSize))::
                          (split chunkSize (List.drop(l,chunkSize))
+                          handle Subscript => raise MalformattedBoard)
 
 fun vecToIntOptionListList bs vec =
     split bs (vecToList (Vector.map singeltonToOption vec))
 
 
-
-
+fun printBoardLine b l = List.foldr (fn (SOME y,()) => print ((Int.toString y)^",")
+                                  | (NONE,()) => print " ,") (print "\n")
+                                                                            l
+fun printBoard b = List.map (printBoardLine b)
+                   (rev (vecToIntOptionListList (debugbs b) (debug b)))
 
 (* readBoard stringlist
    TYPE: string list -> board
