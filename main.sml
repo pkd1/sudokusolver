@@ -6,99 +6,99 @@
 
 abstype board = Board of int * int list vector
 with
-        fun emptyBoard (boardside : int) =
-            let
-                val l = List.tabulate (boardside, (fn x => x+1))
-            in
+    fun emptyBoard (boardside : int) =
+        let
+            val l = List.tabulate (boardside, (fn x => x+1))
+        in
             Board (boardside, Vector.tabulate ((boardside*boardside),
-                (fn _ => l)))
-            end
+                                               (fn _ => l)))
+        end
 
-        fun debug (Board (_, vec)) = vec
-        (* local *)
-        fun boxSide boardside =
+    fun debug (Board (_, vec)) = vec
+    (* local *)
+    fun boxSide boardside =
+        let
+            val sq = trunc (Math.sqrt (real boardside))
+        in
+            if sq*sq = boardside then sq else 1
+        end
+
+    fun xyToBlock (boardside : int) (x : int) (y : int) =
+        let
+            val bs = boxSide boardside
+        in
+            (y div bs) * bs + x div bs
+        end
+    fun blockposToIndex (boardside : int) (block : int) (pos : int) : int =
+        if 0 <= block andalso block < boardside andalso
+           0 <= pos andalso pos < boardside then
             let
-                val sq = trunc (Math.sqrt (real boardside))
+                val sqrtSide = boxSide boardside
             in
-                if sq*sq = boardside then sq else 1
+                (block div sqrtSide) * boardside * sqrtSide
+                + ((block mod sqrtSide) * sqrtSide)
+                + (pos div sqrtSide) * boardside
+                + (pos mod sqrtSide)
             end
+        else raise Subscript
+    fun xyToIndex (boardside : int) (x : int) (y : int) : int =
+        if 0 <= x andalso x < boardside andalso
+           0 <= y andalso y < boardside then
+            (y * boardside) + x
+        else raise Subscript
+    fun indexToxy (boardside : int) (index : int) =
+        if 0 <= index andalso index < boardside*boardside
+        then (index mod boardside, index div boardside)
+        else raise Subscript
 
-        fun xyToBlock (boardside : int) (x : int) (y : int) =
-            let
-                val bs = boxSide boardside
-            in
-                (y div bs) * bs + x div bs
-            end
-        fun blockposToIndex (boardside : int) (block : int) (pos : int) : int =
-            if 0 <= block andalso block < boardside andalso
-               0 <= pos andalso pos < boardside then
-                let
-                    val sqrtSide = boxSide boardside
-                in
-                    (block div sqrtSide) * boardside * sqrtSide
-                    + ((block mod sqrtSide) * sqrtSide)
-                    + (pos div sqrtSide) * boardside
-                    + (pos mod sqrtSide)
-                end
-            else raise Subscript
-        fun xyToIndex (boardside : int) (x : int) (y : int) : int =
-            if 0 <= x andalso x < boardside andalso
-               0 <= y andalso y < boardside then
-                (y * boardside) + x
-            else raise Subscript
-	fun indexToxy (boardside : int) (index : int) =
-	    if 0 <= index andalso index < boardside*boardside
-	    then (index mod boardside, index div boardside)
-	    else raise Subscript
+    fun getCell (Board (boardside, vec) : board) (x : int) (y : int) =
+        Vector.sub(vec, xyToIndex boardside x y)
 
-        fun getCell (Board (boardside, vec) : board) (x : int) (y : int) =
-                Vector.sub(vec, xyToIndex boardside x y)
+    exception NotASolution
 
-	exception NotASolution
+    fun setCell (Board (boardside, vec) : board) (x : int) (y : int) (num : int) =
+        let
+            val newvec =
+                Vector.mapi (fn (index, poss) =>
+                                let
+                                    val (xi, yi) = indexToxy boardside index
+                                    val b = xyToBlock boardside x y
+                                    val bi = (case indexToxy boardside index of
+                                                  (xi,yi) => xyToBlock boardside xi yi)
+                                in
+                                    case (xi = x, yi = y, bi = b) of
+                                        (true,true,_)       => [num]                  (* The cell being updated *)
+                                      | (false,false,false) => Vector.sub(vec, index) (* other block, column and row *)
+                                      (* not the cell being updated but on a common block, column or row. *)
+                                      | (_,_,_) => List.filter (fn x => x <> num) poss
+                                end)
+                            vec
 
-        fun setCell (Board (boardside, vec) : board) (x : int) (y : int) (num : int) =
-	let
-	    val newvec =
-		Vector.mapi (fn (index, poss) =>
-				let
-				    val (xi, yi) = indexToxy boardside index
-				    val b = xyToBlock boardside x y
-				    val bi = (case indexToxy boardside index of
-						 (xi,yi) => xyToBlock boardside xi yi)
-				in
-				    case (xi = x, yi = y, bi = b) of
-					(true,true,_)       => [num]                  (* The cell being updated *)
-				      | (false,false,false) => Vector.sub(vec, index) (* other block, column and row *)
-				      (* not the cell being updated but on a common block, column or row. *)
-				      | (_,_,_) => List.filter (fn x => x <> num) poss
-				end)
-			    vec
-
-	    (* Find the new singleton lists. Panic on nil *)
-	    fun singleton_coordinates (v: int list vector)
-	      = Vector.foldli (fn (i,l,res)
-				  => case (l,i=xyToIndex boardside x y) of
-					 (* In case of a singleton, note the xy-coord and the member... *)
-					 (a::nil,false) => (case Vector.sub(vec,i) of
-								b::c::t => (indexToxy boardside i, a)::res
-							      | _       => res)
-				       (* ...and panic if encountering nil. *)
-				       | (nil,_) => raise NotASolution
-				       | _ => res)
-			      [] v
-	in
-	    (* Update all of the changed positions using setCell to propagate the new restrictions. *)
-	    List.foldl (fn ( ((x,y), a), brd)
-			   => setCell (Board(boardside, newvec)) x y a)
-		       (Board(boardside, newvec))
-		       (singleton_coordinates newvec)
-	end
+            (* Find the new singleton lists. Panic on nil *)
+            fun singleton_coordinates (v: int list vector)
+              = Vector.foldli (fn (i,l,res)
+                                  => case (l,i=xyToIndex boardside x y) of
+                                         (* In case of a singleton, note the xy-coord and the member... *)
+                                         (a::nil,false) => (case Vector.sub(vec,i) of
+                                                                b::c::t => (indexToxy boardside i, a)::res
+                                                              | _       => res)
+                                       (* ...and panic if encountering nil. *)
+                                       | (nil,_) => raise NotASolution
+                                       | _ => res)
+                              [] v
+        in
+            (* Update all of the changed positions using setCell to propagate the new restrictions. *)
+            List.foldl (fn ( ((x,y), a), brd)
+                           => setCell (Board(boardside, newvec)) x y a)
+                       (Board(boardside, newvec))
+                       (singleton_coordinates newvec)
+        end
 
 
 
 
-        (* in *)
-        (* end *)
+(* in *)
+(* end *)
 end
 
 (* readLines fname
