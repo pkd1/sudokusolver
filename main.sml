@@ -144,39 +144,6 @@ fun readNumbersFromLine line = List.map Int.fromString (String.fields (fn c => c
 fun singeltonToOption [x] = SOME x
   | singeltonToOption _ = NONE
 
-fun vecToList v = Vector.foldl (fn (e,buf) => e::buf) [] v
-
-(* split l
-   TYPE: a' list -> a' list
-   PRE:  true ??????????????????????????????????????
-   POST: a list split in in several lists of chunkSize elements.
-   VARIANT: length l
-   EXCEPTION: raises:
-      MalformattedBoard - if chunkSize is not a dividier in length l.
-*)
-
-fun split chunkSize [] = []
-  | split chunkSize l = (List.take(l,chunkSize))::
-                         (split chunkSize (List.drop(l,chunkSize))
-                          handle Subscript => raise MalformattedBoard)
-
-fun vecToIntOptionListList bs vec =
-    split bs (vecToList (Vector.map singeltonToOption vec))
-
-fun vecToListList bs vec = split bs (vecToList vec)
-
-fun printBoardL b l = List.foldr (fn (y,()) => print ((listToString y)^", "))
-                                 (print "\n") l
-
-fun printBoardLine b l = List.foldr (fn (SOME y,()) => print ((Int.toString y)^",")
-                                  | (NONE,()) => print " ,") (print "\n") l
-
-fun printBoard b = List.map (printBoardLine b)
-                   (rev (vecToIntOptionListList (debugbs b) (debug b)))
-
-fun printBoardLists b = List.map (printBoardL b)
-                   (rev (vecToListList (debugbs b) (debug b)))
-
 fun newPrint b =
     let
 
