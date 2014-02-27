@@ -165,11 +165,6 @@ fun vecToIntOptionListList bs vec =
 
 fun vecToListList bs vec = split bs (vecToList vec)
 
-fun listToStringAux buf [] = buf^"]"
-  | listToStringAux buf [e] = buf^(Int.toString e)^"]"
-  | listToStringAux buf (e::l) = listToStringAux (buf^(Int.toString e)^",") l
-val listToString = listToStringAux "["
-
 fun printBoardL b l = List.foldr (fn (y,()) => print ((listToString y)^", "))
                                  (print "\n") l
 
@@ -184,6 +179,13 @@ fun printBoardLists b = List.map (printBoardL b)
 
 fun newPrint b =
     let
+
+        fun listToStringAux buf [] = buf^"]"
+          | listToStringAux buf [e] = buf^(Int.toString e)^"]"
+          | listToStringAux buf (e::l) = listToStringAux
+                                             (buf^(Int.toString e)^",") l
+        val listToString = listToStringAux "["
+
         fun revBoardString b bs 0 0 = listToString (getCell b 0 0)
           | revBoardString b bs 0 y = (listToString (rev (getCell b 0 y)))^
                                       "\n"^(revBoardString b bs (bs-1) (y-1))
