@@ -159,10 +159,10 @@ fun newPrint b =
         val listToString = listToStringAux "["
 
         fun revBoardString f b bs 0 0 = f (getCell b 0 0)
-          | revBoardString f b bs 0 y = (f (getCell b 0 y))^
-                                      "\n"^(revBoardString f b bs (bs-1) (y-1))
-          | revBoardString f b bs x y = (f (getCell b x y))^
-                                      ","^(revBoardString f b bs (x-1) y)
+          | revBoardString f b bs 0 y = (f (getCell b 0 y))^"\n"^
+                                        (revBoardString f b bs (bs-1) (y-1))
+          | revBoardString f b bs x y = (f (getCell b x y))^","^
+                                        (revBoardString f b bs (x-1) y)
 
         fun reverseString' new [] = new
           | reverseString' new (#"]"::old) = reverseString' (#"["::new) old
