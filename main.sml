@@ -205,8 +205,9 @@ fun readBoard [] = raise Fail "No data"
                  (List.foldr
                  (fn ( NONE , (b,x)) => (b,x-1)
                    | (SOME n, (b,x)) => (setCell b x y n,x-1))
-                 (readBoardAux (y-1) xs,lsl-1) (readNumbersFromLine s))
-            handle Subscript => raise MalformattedBoard (* Wrong dim *)
+                 (readBoardAux (y-1) xs,lsl-1) (readNumbersFromLine s)
+                  handle Subscript => raise MalformattedBoard) (* Wrong dim *)
+          | readBoardAux _ _ = raise MalformattedBoard
     in
         readBoardAux (lsl-1) stringlist
     end
