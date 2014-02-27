@@ -158,7 +158,7 @@ fun newPrint b =
                                              (buf^(Int.toString e)^",") l
         val listToString = listToStringAux "["
 
-        fun revBoardString b bs 0 0 = listToString (getCell b 0 0)
+        fun revBoardString b bs 0 0 = listToString (rev (getCell b 0 0))
           | revBoardString b bs 0 y = (listToString (rev (getCell b 0 y)))^
                                       "\n"^(revBoardString b bs (bs-1) (y-1))
           | revBoardString b bs x y = (listToString (rev (getCell b x y)))^
