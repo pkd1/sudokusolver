@@ -182,20 +182,23 @@ fun printBoard b = List.map (printBoardLine b)
 fun printBoardLists b = List.map (printBoardL b)
                    (rev (vecToListList (debugbs b) (debug b)))
 
-fun boardString b bs 0 0 = (listToString (getCell b 0 0))
-  | boardString b bs 0 y = (listToString (getCell b 0 y))^"\n"^(boardString b bs (bs-1) (y-1))
-  | boardString b bs x y = (listToString (getCell b x y))^","^(boardString b bs (x-1) y)
-
-fun reverseString' new [] = new
-  | reverseString' new (#"]"::old) = reverseString' (#"["::new) old
-  | reverseString' new (#"["::old) = reverseString' (#"]"::new) old
-  | reverseString' new (c::old) = reverseString' (c::new) old
-val reverseString = implode o (reverseString' []) o explode (* from rosettacode wiki *)
 fun newPrint b =
     let
+        fun revBoardString b bs 0 0 = listToString (getCell b 0 0)
+          | revBoardString b bs 0 y = (listToString (rev (getCell b 0 y)))^
+                                      "\n"^(revBoardString b bs (bs-1) (y-1))
+          | revBoardString b bs x y = (listToString (rev (getCell b x y)))^
+                                      ","^(revBoardString b bs (x-1) y)
+
+        fun reverseString' new [] = new
+          | reverseString' new (#"]"::old) = reverseString' (#"["::new) old
+          | reverseString' new (#"["::old) = reverseString' (#"]"::new) old
+          | reverseString' new (c::old) = reverseString' (c::new) old
+        val reverseString = implode o (reverseString' []) o explode
+                                 (* modified from rosettacode wiki *)
         val bs = debugbs b;
     in
-        print (reverseString ( boardString b bs (bs-1) (bs-1)))
+        print (reverseString ( revBoardString b bs (bs-1) (bs-1)))
     end
 
 (* readBoard stringlist
