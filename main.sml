@@ -166,10 +166,12 @@ fun vecToIntOptionListList bs vec =
 fun vecToListList bs vec = split bs (vecToList vec)
 
 fun listToStringAux buf [] = buf^"]"
-  | listToStringAux buf (e::l) = listToStringAux ((Int.toString e)^", "^buf) l
+  | listToStringAux buf [e] = buf^(Int.toString e)^"]"
+  | listToStringAux buf (e::l) = listToStringAux (buf^(Int.toString e)^",") l
+val listToString = listToStringAux "["
 
-fun printBoardL b l = List.foldr (fn (y,()) => print ((listToStringAux "" y)^",")
-                                  | ([],()) => print " ,") (print "\n") l
+fun printBoardL b l = List.foldr (fn (y,()) => print ((listToString y)^", "))
+                                 (print "\n") l
 
 fun printBoardLine b l = List.foldr (fn (SOME y,()) => print ((Int.toString y)^",")
                                   | (NONE,()) => print " ,") (print "\n") l
