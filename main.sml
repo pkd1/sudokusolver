@@ -57,40 +57,45 @@ with
 
     exception NotASolution
 
-    fun setCell (Board (boardside, vec) : board) (x : int) (y : int) (num : int) =
+    fun setCell (Board (boardside, oldvec) : board) (x : int) (y : int) (num : int) =
         let
             val newvec =
-                Vector.mapi (fn (index, poss) =>
+                Vector.mapi (fn (index, possibilities_at_i) =>
                                 let
                                     val (xi, yi) = indexToxy boardside index
-                                    val b = xyToBlock boardside x y
-                                    val bi = (case indexToxy boardside index of
-                                                  (xi,yi) => xyToBlock boardside xi yi)
+                                    val block_of_xy = xyToBlock boardside x y
+                                    val block_of_i  = xyToBlock boardside xi yi
                                 in
-                                    case (xi = x, yi = y, bi = b) of
+                                    case (xi = x, yi = y, block_of_i = block_of_xy) of
                                         (true,true,_)       => [num]                  (* The cell being updated *)
-                                      | (false,false,false) => Vector.sub(vec, index) (* other block, column and row *)
+                                      | (false,false,false) => Vector.sub(oldvec, index) (* other block, column and row *)
                                       (* not the cell being updated but on a common block, column or row. *)
-                                      | (_,_,_) => List.filter (fn x => x <> num) poss
+                                      | (_,_,_) => List.filter (fn x => x <> num) possibilities_at_i
                                 end)
-                            vec
+                            oldvec
 
             (* Find the new singleton lists. Panic on nil *)
             fun singleton_coordinates (v: int list vector)
-              = Vector.foldli (fn (i,l,res)
-                                  => case (l,i=xyToIndex boardside x y) of
+              = Vector.foldli (fn (index,possibilities_at_index,accumulator)
+                                  => case (possibilities_at_index,index=xyToIndex boardside x y) of
                                          (* In case of a singleton, note the xy-coord and the member... *)
-                                         (a::nil,false) => (case Vector.sub(vec,i) of
-                                                                b::c::t => (indexToxy boardside i, a)::res
-                                                              | _       => res)
+                                         (a::nil,false) => (case Vector.sub(oldvec,index) of
+                                                                b::c::t => (indexToxy boardside index, a)::accumulator
+                                                              | _       => accumulator)
                                        (* ...and panic if encountering nil. *)
                                        | (nil,_) => raise NotASolution
-                                       | _ => res)
+                                       | _ => accumulator)
                               [] v
+
+                fun propagate_a_at_xy( ((x,y),a), brd )
+                    = case getCell brd x y of
+                          [x] => brd (* already propagated *)
+                        | _   => setCell brd x y a (* not propagated *)
+
+
         in
             (* Update all of the changed positions using setCell to propagate the new restrictions. *)
-            List.foldl (fn ( ((x,y), a), brd)
-                           => setCell (Board(boardside, newvec)) x y a)
+            List.foldl propagate_a_at_xy
                        (Board(boardside, newvec))
                        (singleton_coordinates newvec)
         end
