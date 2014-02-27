@@ -47,7 +47,7 @@ fun test () =
                                                   0 0 1)
                                          1 0 2)
                                 2 2 3)
-                 = fromList[[1],       [2],       [4],    [3],
+                 = Vector.fromList[[1],       [2],       [4],    [3],
                             [3, 4],    [3, 4],    [1, 2], [1, 2],
                             [2, 4],    [1, 4],    [3],    [1, 2, 4],
                             [2, 3, 4], [1, 3, 4], [1, 2], [1, 2, 4]]
@@ -55,7 +55,8 @@ fun test () =
                     0000
                     0030
                     0400
-                  fails hard. sorta. *)
+                  fails hard. sorta. *))
+        ]
         val allPassed = List.all (fn (_,b) => b) tests
         val failedTests = List.foldl (fn ((x,b),s) => if not b then s^(Int.toString(x))^", " else s) "" tests
     in
