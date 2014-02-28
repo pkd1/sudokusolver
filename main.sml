@@ -57,22 +57,21 @@ with
 
     exception NotASolution
 
-    fun setCell (Board (boardside, oldvec) : board) (x : int) (y : int) (num : int) =
+    fun setCell (Board (boardside, oldvec) : board) (x : int) (y : int) (value : int) =
         let
-            val newvec =
-                Vector.mapi (fn (index, possibilities_at_i) =>
-                                let
-                                    val (xi, yi) = indexToxy boardside index
-                                    val block_of_xy = xyToBlock boardside x y
-                                    val block_of_i  = xyToBlock boardside xi yi
-                                in
-                                    case (xi = x, yi = y, block_of_i = block_of_xy) of
-                                        (true,true,_)       => [num]                  (* The cell being updated *)
-                                      | (false,false,false) => Vector.sub(oldvec, index) (* other block, column and row *)
-                                      (* not the cell being updated but on a common block, column or row. *)
-                                      | (_,_,_) => List.filter (fn x => x <> num) possibilities_at_i
-                                end)
-                            oldvec
+            fun removeValueFromRowColBlock (index, possibilities_at_i) =
+                let
+                    val (xi, yi) = indexToxy boardside index
+                    val block_of_xy = xyToBlock boardside x y
+                    val block_of_i  = xyToBlock boardside xi yi
+                in
+                    case (xi = x, yi = y, block_of_i = block_of_xy) of
+                        (true,true,_)       => [value]                  (* The cell being updated *)
+                      | (false,false,false) => Vector.sub(oldvec, index) (* other block, column and row *)
+                      (* not the cell being updated but on a common block, column or row. *)
+                      | (_,_,_) => List.filter (fn x => x <> value) possibilities_at_i
+                end)
+            val newvec = Vector.mapi removeValueFromRowColBlock oldvec
 
             (* Find the new singleton lists. Panic on nil *)
             fun singleton_coordinates (v: int list vector)
