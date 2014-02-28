@@ -57,6 +57,23 @@ with
 
     exception NotASolution
 
+    (* setCell B x y value
+       TYPE: board -> int -> int -> int -> board
+       PRE:  1 <= x, y, value <= boardside
+       POST: Let B = Board(boardside,v), (a,b) \neq (x,y), B' = setCell B x y value
+             B' = Board(boardside',v') and for brevity
+             let w(i,j) denote Vector.sub(w,i+boardside*j).
+
+             View v(i,j) as the possibilities at position (i,j) in a
+             zero indexed sudoku board. Then the following holds
+             - v(a,b) \setminus v'(a,b) is a set containing only impossibilities at (a,b)
+             - v'(a,b) \subseteq v(a,b)
+
+             If v'(i,j) is found to be contradictive then an exception may be raised.
+       EXAMPLE:
+       EXCEPTIONS:
+       VARIANT:
+     *)
     fun setCell (Board (boardside, oldvec) : board) (x : int) (y : int) (value : int) =
         let
             fun removeValueFromRowColBlock (index, possibilities_at_i) =
