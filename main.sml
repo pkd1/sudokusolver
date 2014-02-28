@@ -233,4 +233,5 @@ fun readBoardsFile boardsFile =
    EXAMPLE:
    SIDE-EFFECTS:
    EXCEPTIONS:
+   VARIANT:
 *)
