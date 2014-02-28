@@ -50,12 +50,18 @@ fun test () =
                  = Vector.fromList[[1],       [2],       [4],    [3],
                             [3, 4],    [3, 4],    [1, 2], [1, 2],
                             [2, 4],    [1, 4],    [3],    [1, 2, 4],
-                            [2, 3, 4], [1, 3, 4], [1, 2], [1, 2, 4]]
-                 (* 1200
-                    0000
-                    0030
-                    0400
-                  fails hard. sorta. *))
+                            [2, 3, 4], [1, 3, 4], [1, 2], [1, 2, 4]]),
+
+            (12, debug (setCell (setCell (setCell (setCell (emptyBoard 4)
+                                                           0 0 1)
+                                                  1 0 2)
+                                         2 2 3)
+                                1 3 4)
+                 = fromList[[1], [2], [4],    [3],
+                            [4], [3], [1, 2], [1, 2],
+                            [2], [1], [3],    [4],
+                            [3], [4], [1, 2], [1, 2]])
+
         ]
         val allPassed = List.all (fn (_,b) => b) tests
         val failedTests = List.foldl (fn ((x,b),s) => if not b then s^(Int.toString(x))^", " else s) "" tests
