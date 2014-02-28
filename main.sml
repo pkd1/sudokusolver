@@ -87,15 +87,12 @@ with
                                        | _ => accumulator)
                               [] v
 
-                fun propagate_a_at_xy( ((x,y),a), brd )
-                    = case getCell brd x y of
-                          [x] => brd (* already propagated *)
-                        | _   => setCell brd x y a (* not propagated *)
-
+                fun propagate_at_xy( ((x,y),value_at_xy), brd )
+                    = setCell brd x y value_at_xy
 
         in
             (* Update all of the changed positions using setCell to propagate the new restrictions. *)
-            List.foldl propagate_a_at_xy
+            List.foldl propagate_at_xy
                        (Board(boardside, newvec))
                        (singleton_coordinates newvec)
         end
