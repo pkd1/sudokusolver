@@ -230,6 +230,15 @@ fun readBoardsFile boardsFile =
         List.map readBoard (rev (readBF [] [] fileStrings))
     end
 
+fun readBoards boardsFile =
+    let
+        val fileDescriptor = TextIO.openIn boardsFile
+        val fileString = TextIO.inputAll fileDescriptor
+        val _ = TextIO.closeIn fileDescriptor
+    in
+        fileString
+    end
+
 (* funktionsnamn argument
    TYPE:
    PRE:
