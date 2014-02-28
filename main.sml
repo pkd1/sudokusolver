@@ -215,12 +215,20 @@ fun readBoard [] = raise Fail "No data"
      MalformattedBoard - if boardsFile contains malformatted boards,
      Io                - if boardsFile could not be opened.
 *)
+
 fun readBoardsFile boardsFile =
-    (fn (b,l) => List.map readBoard (l::b)) (
-        List.foldl
-        (fn ("\n",(buf,sl)) => (sl::buf,[])
-          | (s,(buf,sl)) =>  (buf,s::sl) )
-        ([],[]) (readLines boardsFile))
+    let
+        val fileStrings = readLines boardsFile
+        fun readBF boards [] [] = boards
+          | readBF boards buf [] = buf::boards
+          | readBF boards [] (("\n")::lines) = readBF boards [] lines
+          | readBF boards buf (("\n")::lines) =
+                          readBF (buf::boards) [] lines
+          | readBF boards buf (currentLine::lines) =
+                          readBF boards (currentLine::buf) lines
+    in
+        List.map readBoard (rev (readBF [] [] fileStrings))
+    end
 
 (* funktionsnamn argument
    TYPE:
