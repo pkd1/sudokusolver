@@ -1,7 +1,9 @@
-use "main.sml";
+use "main.sml"
+handle e as _ => (print "Exception in main: ";PolyML.print e;
+                  OS.Process.exit OS.Process.failure);
 
 fun test () =
-    let
+    (let
         val empty4 = emptyBoard(4)
         val set222 = setCell empty4 2 2 2
         val all4 = [1,2,3,4]
@@ -58,11 +60,17 @@ fun test () =
                   fails hard. sorta. *))
         ]
         val allPassed = List.all (fn (_,b) => b) tests
-        val failedTests = List.foldl (fn ((x,b),s) => if not b then s^(Int.toString(x))^", " else s) "" tests
+        val failedTests = List.filter (fn (_,b) => not b) tests
     in
         if allPassed then
-            print "\nSUCCESS!\n\n"
+            (print "\nSUCCESS!\n\n"; OS.Process.success)
         else
-            print ("\nFAILED TESTS: " ^ failedTests ^ "\n\n")
-    end;
-test();
+            (print ("\nFAILED TESTS: " ^
+                    (String.concatWith "," (
+                     List.map (fn (n,_) => Int.toString n) failedTests))
+                    ^ "\n\n"); OS.Process.failure)
+    end
+    ) handle e as _ => (print "Exception in test: "; PolyML.print e;
+                        OS.Process.failure);
+
+val _ = OS.Process.exit (test ())
