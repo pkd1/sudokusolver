@@ -87,7 +87,7 @@ with
                       | (false,false,false) => Vector.sub(oldvec, index) (* other block, column and row *)
                       (* not the cell being updated but on a common block, column or row. *)
                       | (_,_,_) => List.filter (fn x => x <> value) possibilities_at_i
-                end)
+                end
             val newvec = Vector.mapi removeValueFromRowColBlock oldvec
 
             (* Find the new singleton lists. Panic on nil *)
