@@ -15,7 +15,10 @@ with
         end
 
     fun debug (Board (_, vec)) = vec
-    fun debugbs (Board(bs,_)) = bs
+    fun getBoxSide (Board(bs,_)) = trunc (Math.sqrt (real bs))
+    fun debugbs (Board(bs,_)) = bs (*depricated*)
+    fun getBoardSide (Board(bs,_)) = bs
+    fun getBoardSize (Board(bs,_)) = bs*bs
 
     fun boxSide boardside =
         let
