@@ -10,6 +10,18 @@ use "main.sml";
             I feel a need for a function converting a
             list of lists to a board...
 
+            How would you represent an empty cell in a list?
+            List of int option? Will be messy aswell.
+            You can always use readBoard for list of strings to board:
+
+            findFirstSolution (readBoard ["1,2, ,3",
+                                          " , , , ",
+                                          " , , , ",
+                                          " , , , "]) =
+            SOME (Board (4, fromList[[1], [2], [4], [3],
+                                     [3], [4], [1], [2],
+                                     [2], [1], [3], [4],
+                                     [4], [3], [2], [1]]));
    VARIANT: The sum of all possibility lists of brd,
             that is the sum of
                 getCell brd x y
