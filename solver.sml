@@ -28,7 +28,9 @@ fun findFirstSolution(brd: board) : board option =
 
         fun findFirstAux [] = NONE
           | findFirstAux (possibleNum::tail)
-            = (findFirstSolution(setCell brd smallx smally possibleNum))
+            = (case findFirstSolution(setCell brd smallx smally possibleNum) of
+                   SOME brd' => SOME brd'
+                 | NONE      => findFirstAux tail)
                handle NotASolution => findFirstAux tail
     in
 
