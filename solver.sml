@@ -9,10 +9,7 @@ fun findFirstSolution(brd: board) : board option =
                 val newLen = List.length newList
                 val oldLen = List.length oldList
             in
-                if newLen >= 2 andalso (oldLen = 1 orelse newLen < oldLen) then
-                    true
-                else
-                    false
+                newLen >= 2 andalso (oldLen = 1 orelse newLen < oldLen)
             end
 
         val coordinateOfSmallestList =
