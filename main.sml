@@ -219,7 +219,7 @@ fun readBoard [] = raise Fail "No data"
                   handle Subscript => raise MalformattedBoard) (* Wrong dim *)
           | readBoardAux _ _ = raise MalformattedBoard
     in
-        readBoardAux (lsl-1) stringlist
+        readBoardAux (lsl-1) (rev stringlist)
     end
 
 (* readBoardsFile boardsFile
@@ -243,7 +243,7 @@ fun readBoardsFile boardsFile =
           | readBF boards buf (currentLine::lines) =
                           readBF boards (currentLine::buf) lines
     in
-        List.map readBoard (rev (readBF [] [] fileStrings))
+        List.map readBoard (readBF [] [] (rev fileStrings))
     end
 
 (* funktionsnamn argument
