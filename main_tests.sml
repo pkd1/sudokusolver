@@ -1,6 +1,9 @@
 use "main.sml"
 handle e as _ => (print "Exception in main: ";PolyML.print e;
                   OS.Process.exit OS.Process.failure);
+use "solver.sml"
+handle e as _ => (print "Exception in solver: ";PolyML.print e;
+                  OS.Process.exit OS.Process.failure);
 
 fun test () =
     (let
@@ -62,7 +65,13 @@ fun test () =
                  = Vector.fromList[[1], [2], [4],    [3],
                             [4], [3], [1, 2], [1, 2],
                             [2], [1], [3],    [4],
-                            [3], [4], [1, 2], [1, 2]])
+                            [3], [4], [1, 2], [1, 2]]),
+            (13, case findFirstSolution (emptyBoard 4) of
+                     SOME brd => true
+                   | NONE     => false),
+            (14, case findFirstSolution (emptyBoard 9) of
+                     SOME brd => true
+                   | NONE     => false)
 
         ]
         val allPassed = List.all (fn (_,b) => b) tests
