@@ -83,6 +83,19 @@ with
     fun getCell (Board (boxSide, vec) : board) (x : int) (y : int) =
         Vector.sub(vec, xyToIndex (boxSide*boxSide) x y)
 
+    fun boardToListList b =
+        let
+            val bs = getBoardSide b
+            fun revBoardToListList row full 0 0 =
+                (rev ((getCell b 0 0)::row))::full
+              | revBoardToListList row full 0 y =
+                revBoardToListList [] (rev ((getCell b 0 y)::row)::full) (bs-1) (y-1)
+              | revBoardToListList row full x y =
+                revBoardToListList ((getCell b x y)::row) full (x-1) y
+        in
+            rev (revBoardToListList [] [] (bs-1) (bs-1))
+        end
+
     exception NotASolution
 
     (* setCell B x y value
@@ -199,34 +212,29 @@ fun readNumbersFromLine line = List.map Int.fromString (String.fields (fn c => c
 
 
 
-fun singeltonToOption [x] = SOME x
-  | singeltonToOption _ = NONE
+fun singeltonToString [x] = StringCvt.padLeft #" " 8 (Int.toString x)
+  | singeltonToString _ = "        "
 
-fun newPrint b =
+fun listToString pad l = "[" ^ (StringCvt.padLeft #" " (pad*2-1)
+           (String.concatWith "," (List.map Int.toString l))) ^ "]"
+
+fun toFString f b =
     let
-
-        fun listToStringAux buf [] = buf^"]"
-          | listToStringAux buf [e] = buf^(Int.toString e)^"]"
-          | listToStringAux buf (e::l) = listToStringAux
-                                             (buf^(Int.toString e)^",") l
-        val listToString = listToStringAux "["
-
-        fun revBoardString f b bs 0 0 = f (getCell b 0 0)
-          | revBoardString f b bs 0 y = (f (getCell b 0 y))^"\n"^
-                                        (revBoardString f b bs (bs-1) (y-1))
-          | revBoardString f b bs x y = (f (getCell b x y))^","^
-                                        (revBoardString f b bs (x-1) y)
-
-        fun reverseString' new [] = new
-          | reverseString' new (#"]"::old) = reverseString' (#"["::new) old
-          | reverseString' new (#"["::old) = reverseString' (#"]"::new) old
-          | reverseString' new (c::old) = reverseString' (c::new) old
-        val reverseString = implode o (reverseString' []) o explode
-                                 (* modified from rosettacode wiki *)
-        val bs = getBoardSide b;
+        val l = boardToListList b
+        fun concatWith string func = String.concatWith string o List.map func;
     in
-        print (reverseString
-               (revBoardString (listToString o rev) b bs (bs-1) (bs-1)))
+       concatWith "\n" (concatWith "," f) l
+    end
+
+val toString = toFString singeltonToString
+
+val printBoard = print o toString
+
+fun printPos b =
+    let
+        val len = getBoardSide b
+    in
+        (print o toFString (listToString len)) b
     end
 
 (* readBoard stringlist
