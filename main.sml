@@ -1,4 +1,5 @@
 
+exception MalformattedBoard
 
 (* REPRESENTATION CONVENTION:
    REPRESENTATION INVARIANT:
@@ -6,45 +7,25 @@
 
 abstype board = Board of int * int list vector
 with
-    fun emptyBoard (boardside : int) =
+    fun emptyBoard (boardSide : int) =
         let
-            val l = List.tabulate (boardside, (fn x => x+1))
+            val sq = trunc (Math.sqrt (real boardSide))
+            val boxSide = if sq*sq = boardSide then sq else
+                          raise MalformattedBoard
+            val l = List.tabulate (boardSide, (fn x => x+1))
         in
-            Board (boardside, Vector.tabulate ((boardside*boardside),
+            Board (boxSide, Vector.tabulate ((boardSide*boardSide),
                                                (fn _ => l)))
         end
 
-    fun debug (Board (_, vec)) = vec
-    fun getBoxSide (Board(bs,_)) = trunc (Math.sqrt (real bs))
-    fun debugbs (Board(bs,_)) = bs (*depricated*)
-    fun getBoardSide (Board(bs,_)) = bs
-    fun getBoardSize (Board(bs,_)) = bs*bs
+    fun debug (Board (_,vec)) = vec (* only used in test suite *)
+    fun getBoxSide (Board(bs,_)) = bs
+    fun getBoardSide (Board(bs,_)) = bs*bs
+    fun getBoardSize (Board(bs,_)) = let val b = bs*bs in b*b end
 
-    fun boxSide boardside =
-        let
-            val sq = trunc (Math.sqrt (real boardside))
-        in
-            if sq*sq = boardside then sq else 1
-        end
+    fun xyToBlock (boxSide : int) (x : int) (y : int) =
+        (y div boxSide) * boxSide + x div boxSide
 
-    fun xyToBlock (boardside : int) (x : int) (y : int) =
-        let
-            val bs = boxSide boardside
-        in
-            (y div bs) * bs + x div bs
-        end
-    fun blockposToIndex (boardside : int) (block : int) (pos : int) : int =
-        if 0 <= block andalso block < boardside andalso
-           0 <= pos andalso pos < boardside then
-            let
-                val sqrtSide = boxSide boardside
-            in
-                (block div sqrtSide) * boardside * sqrtSide
-                + ((block mod sqrtSide) * sqrtSide)
-                + (pos div sqrtSide) * boardside
-                + (pos mod sqrtSide)
-            end
-        else raise Subscript
     fun xyToIndex (boardside : int) (x : int) (y : int) : int =
         if 0 <= x andalso x < boardside andalso
            0 <= y andalso y < boardside then
@@ -55,8 +36,8 @@ with
         then (index mod boardside, index div boardside)
         else raise Subscript
 
-    fun getCell (Board (boardside, vec) : board) (x : int) (y : int) =
-        Vector.sub(vec, xyToIndex boardside x y)
+    fun getCell (Board (boxSide, vec) : board) (x : int) (y : int) =
+        Vector.sub(vec, xyToIndex (boxSide*boxSide) x y)
 
     exception NotASolution
 
@@ -77,13 +58,15 @@ with
        EXCEPTIONS:
        VARIANT:
      *)
-    fun setCell (Board (boardside, oldvec) : board) (x : int) (y : int) (value : int) =
+    fun setCell (oldbrd as Board (oldbs, oldvec) : board) (x : int) (y : int) (value : int) =
         let
+            val boardside = getBoardSide oldbrd
+            val boxSide = getBoxSide oldbrd
             fun removeValueFromRowColBlock (index, possibilities_at_i) =
                 let
                     val (xi, yi) = indexToxy boardside index
-                    val block_of_xy = xyToBlock boardside x y
-                    val block_of_i  = xyToBlock boardside xi yi
+                    val block_of_xy = xyToBlock boxSide x y
+                    val block_of_i  = xyToBlock boxSide xi yi
                 in
                     case (xi = x, yi = y, block_of_i = block_of_xy) of
                         (true,true,_)       => [value]                  (* The cell being updated *)
@@ -112,7 +95,7 @@ with
         in
             (* Update all of the changed positions using setCell to propagate the new restrictions. *)
             List.foldl propagate_at_xy
-                       (Board(boardside, newvec))
+                       (Board(oldbs, newvec))
                        (singleton_coordinates newvec)
         end
 
@@ -143,8 +126,6 @@ fun readLines fname =
   in
     readLinesAux (openIn fname)
   end;
-
-exception MalformattedBoard
 
 (* readNumbersFromLine line
    TYPE: string -> int option list
@@ -186,7 +167,7 @@ fun newPrint b =
           | reverseString' new (c::old) = reverseString' (c::new) old
         val reverseString = implode o (reverseString' []) o explode
                                  (* modified from rosettacode wiki *)
-        val bs = debugbs b;
+        val bs = getBoardSide b;
     in
         print (reverseString
                (revBoardString (listToString o rev) b bs (bs-1) (bs-1)))
