@@ -4,16 +4,9 @@ use "main.sml";
    TYPE: board -> board option
    PRE:  true
    POST: If brd is a solvable board return SOME brd'
-         where brd' is a solved board compatible
-         with brd.
-   EXAMPLE: !!! TODO !!!
-            I feel a need for a function converting a
-            list of lists to a board...
-
-            How would you represent an empty cell in a list?
-            List of int option? Will be messy aswell.
-            You can always use readBoard for list of strings to board:
-
+         where brd' is a solved board extending brd.
+   EXAMPLE: The following is compatible but not
+            guaranteed by the specification.
             findFirstSolution (readBoard ["1,2, ,3",
                                           " , , , ",
                                           " , , , ",
@@ -25,7 +18,7 @@ use "main.sml";
    VARIANT: The sum of all possibility lists of brd,
             that is the sum of
                 getCell brd x y
-            for all x and y.
+            for all x and y in [1,getBoardSide brd].
 *)
 fun findFirstSolution(brd: board) : board option =
     let
@@ -52,6 +45,7 @@ fun findFirstSolution(brd: board) : board option =
             end
 
         val coordinateOfSmallestList =
+            (* finds a least list in brd in the smallerthan order *)
             List.foldl (fn (x,minimalSoFar) =>
                            List.foldl
                                (fn (y,(oldx,oldy)) =>
@@ -68,10 +62,23 @@ fun findFirstSolution(brd: board) : board option =
         (* findFirstAux lst
          TYPE: int list -> board option
          PRE:  All members of lst must lie in [1,boardside]
-         POST: If a solution exists return SOME sol where
-               sol is a solution extending brd.
+         POST: If a solution for brd exists return SOME sol
+               where sol is a solution extending brd.
                Otherwise, return NONE
-         EXAMPLE:  !TODO!
+         EXAMPLE:
+              If coordinateOfSmallestList = (0,1)
+              and brd = (readBoard ["1, , , ",
+                                    " , ,1, ",
+                                    " , , ,1",
+                                    " ,1, , "])
+              then the following is compatible with but not
+              guaranteed byt the specification.
+              findFirstAux [2,3,4] =
+                 SOME (Board(2,fromList
+                                   [[1], [3], [2], [4],
+                                    [2], [4], [1], [3],
+                                    [3], [2], [4], [1],
+                                    [4], [1], [3], [2]])): board option
          VARIANT: The length of lst.
          *)
         fun findFirstAux [] = NONE
