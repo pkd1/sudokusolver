@@ -114,7 +114,8 @@ with
        EXCEPTIONS: may raise NotASolution.
        VARIANT: The sum of the lengths of the lists in v.
      *)
-    fun setCell (oldbrd as Board (oldbs, oldvec) : board) (x : int) (y : int) (value : int) =
+    fun setCell (oldbrd as Board (oldbs, oldvec) : board)
+                (x : int) (y : int) (value : int) =
         let
             val boardside = getBoardSide oldbrd
             val boxSide = getBoxSide oldbrd
@@ -203,7 +204,8 @@ fun readLines fname =
    EXAMPLE: readNumbersFromLine "1, ,0,4,,3," =
             [SOME 1, NONE, SOME 0, SOME 4, NONE, SOME 3, NONE]
 *)
-fun readNumbersFromLine line = List.map Int.fromString (String.fields (fn c => c = #",") line)
+fun readNumbersFromLine line
+      = List.map Int.fromString (String.fields (fn c => c = #",") line)
 
 
 
