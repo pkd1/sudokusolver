@@ -71,7 +71,11 @@ fun test () =
                    | NONE     => false),
             (14, case findFirstSolution (emptyBoard 9) of
                      SOME brd => true
-                   | NONE     => false)
+                   | NONE     => false),
+
+            (15, List.all isSome
+                          (List.map findFirstSolution
+                                    (readBoardsFile "puzzlefiles/hard9x9.txt")))
 
         ]
         val allPassed = List.all (fn (_,b) => b) tests
