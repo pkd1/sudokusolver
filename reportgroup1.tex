@@ -3,9 +3,10 @@
 \usepackage[swedish]{babel}
 \usepackage{fullpage, hyperref, amsmath, amssymb, mathtools}
 \usepackage[parfill]{parskip}
+\usepackage{color}
 
 \title{A parallel Sudoku solver\\\small{PKD group 1}}
-\author{Alexander Andersson, 860616-1530 \and Alvar...}
+\author{Alexander Andersson, 860616-1530 \and Alvar Bjerkeng van Keppel}
 \date{\today}
 
 \begin{document}
@@ -14,14 +15,48 @@
 
 \begin{abstract}
 
-
 \end{abstract}
 
 \tableofcontents
 
 \section{Idea}
 
+% naiv backtracking
+% parallelisering om det finns tid över
+The project idea was to implement a sudoku solver in ML using backtracking and to add bells and whistles if time permits. On the list of bells and whistles are to make the solver try finding different solutions in parallel and {\color{red}something more?}.
+
+
 \section{Implementation}
+
+\subsection{Generalization of the problem}
+
+The Sudoku puzzle can be generalized slightly by allowing the side of the board to be the square of a positive integer (ie $1, 4, 9, 25, \dots$). This is the puzzle the implementation described in this report solves.
+
+\subsection{\texttt{abstype board}}
+The main data structure is the abstract data type \texttt{board}. \texttt{board} is of type int * int list vector. The integer describes the boxlength. The vector has one index for each cell in the board. There is a mapping from $(x,y)$ coordinates defined by \texttt{indexToxy : int -> int * int} and the almost inverse \texttt{xyToIndex : int -> int -> int}. the list at index \texttt{xyToIndex i j} represents all the numbers that have not been judged impossible at $(x,y)$. As of writing this, k is judged impossible at $(i,j)$ if and only if there is a $(x,y)$ such that
+\begin{itemize}
+\item $(x,y)$ is distinct from $(i,j)$
+\item $(x,y)$ lies in the same row, column or box as $(i,j)$
+\item the list at $(x,y)$ is $[k]$.
+\end{itemize}
+
+\subsection{\texttt{setCell}}
+
+This is the function that does the heavy lifting to eliminate numbers from cells in the board. \texttt{setCell} takes a board, an $(x,y)$ coordinate and a number $k$ to place at the given position. It returns a new board with the $(x,y)$ index set to $[k]$ where $k$ is removed from the possible values of the cells in the same row, column or box. If one of these cells become a singleton, the same thing is done until nothing needs updating for the invariant to hold.
+
+\subsection{Solving algorithm}
+
+As of this writing the solving algorithm tries to find one solution. This is done by the following steps
+
+\begin{itemize}
+\item Take the current board if it is completely determined. Otherwise...
+\item Find a cell with more than one possibility
+\item Successively guess at the possibilities for cell and
+        apply the solving algorithm on the new board
+\item If one is found, return it, otherwise fail
+\end{itemize}
+
+The function implementing this algorithm is \texttt{findFirstSolution : board -> board option} which returns \texttt{SOME solution} if a solution is found and \texttt{NONE} otherwise.
 
 \section{Performance}
 

@@ -127,45 +127,56 @@ with
        EXCEPTIONS: may raise NotASolution.
        VARIANT: The sum of the lengths of the lists in v.
      *)
-    fun setCell (oldbrd as Board (oldbs, oldvec) : board) (x : int) (y : int) (value : int) =
+    fun setCell (oldbrd as Board (oldbs, oldvec) : board)
+                (x : int) (y : int) (value : int) =
         let
             val boardside = getBoardSide oldbrd
             val boxSide = getBoxSide oldbrd
-            fun removeValueFromRowColBlock (index, possibilities_at_i) =
+            fun removeValueFromRowColBlock (index, possibilitiesAti) =
                 let
                     val (xi, yi) = indexToxy boardside index
-                    val block_of_xy = xyToBlock boxSide x y
-                    val block_of_i  = xyToBlock boxSide xi yi
+                    val blockOfxy = xyToBlock boxSide x y
+                    val blockOfi  = xyToBlock boxSide xi yi
                 in
-                    case (xi = x, yi = y, block_of_i = block_of_xy) of
-                        (true,true,_)       => [value]                  (* The cell being updated *)
-                      | (false,false,false) => Vector.sub(oldvec, index) (* other block, column and row *)
-                      (* not the cell being updated but on a common block, column or row. *)
-                      | (_,_,_) => List.filter (fn x => x <> value) possibilities_at_i
+                    case (xi = x, yi = y, blockOfi = blockOfxy) of
+                        (* The cell being updated *)
+                        (true,true,_)       => [value]
+                        (* Other block, column and row *)
+                      | (false,false,false) => Vector.sub(oldvec, index)
+                        (* Not the cell being updated but on a
+                             common block, column or row. *)
+                      | (_,_,_) => List.filter (fn x => x <> value)
+                                               possibilitiesAti
                 end
             val newvec = Vector.mapi removeValueFromRowColBlock oldvec
 
             (* Find the new singleton lists. Panic on nil *)
-            fun singleton_coordinates (v: int list vector)
-              = Vector.foldli (fn (index,possibilities_at_index,accumulator)
-                                  => case (possibilities_at_index,index=xyToIndex boardside x y) of
-                                         (* In case of a singleton, note the xy-coord and the member... *)
-                                         (a::nil,false) => (case Vector.sub(oldvec,index) of
-                                                                b::c::t => (indexToxy boardside index, a)::accumulator
-                                                              | _       => accumulator)
-                                       (* ...and panic if encountering nil. *)
-                                       | (nil,_) => raise NotASolution
+            fun getValueAndCoordinateOfSingletons (v: int list vector)
+              = Vector.foldli
+                    (fn (index,possibilitiesAtIndex,accumulator)
+                        => case (possibilitiesAtIndex,
+                                 index=xyToIndex boardside x y) of
+                               (* In case of a singleton,
+                                    put the xy-coord and the member
+                                    into the accumulator... *)
+                               (a::nil,false)
+                                 => (case Vector.sub(oldvec,index) of
+                                         b::c::t
+                                           => (indexToxy boardside index, a)
+                                                 ::accumulator
                                        | _ => accumulator)
-                              [] v
-
-                fun propagate_at_xy( ((x,y),value_at_xy), brd )
-                    = setCell brd x y value_at_xy
+                               (* ...and panic if encountering nil. *)
+                             | (nil,_) => raise NotASolution
+                             | _ => accumulator)
+                    [] v
 
         in
-            (* Update all of the changed positions using setCell to propagate the new restrictions. *)
-            List.foldl propagate_at_xy
+            (* Update all of the changed positions using setCell
+                 to propagate the new restrictions. *)
+            List.foldl (fn (((x,y),valueAtxy), brd )
+                           => setCell brd x y valueAtxy)
                        (Board(oldbs, newvec))
-                       (singleton_coordinates newvec)
+                       (getValueAndCoordinateOfSingletons newvec)
         end
 
 
@@ -206,7 +217,8 @@ fun readLines fname =
    EXAMPLE: readNumbersFromLine "1, ,0,4,,3," =
             [SOME 1, NONE, SOME 0, SOME 4, NONE, SOME 3, NONE]
 *)
-fun readNumbersFromLine line = List.map Int.fromString (String.fields (fn c => c = #",") line)
+fun readNumbersFromLine line
+      = List.map Int.fromString (String.fields (fn c => c = #",") line)
 
 
 
