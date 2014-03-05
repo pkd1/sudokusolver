@@ -21,6 +21,12 @@ exception MalformattedBoard
     non-excluded values.
 
     If v(i,j) = [k] the cell is considered to be set.
+    k is said to be an impossibility at (i,j) if
+      putting k at (i,j) makes the board impossible
+      to solve.
+
+    A board B' = Board (n',v') is said to extend B
+    if v'(i,j) is a subset or equal to v(i,j).
 
    REPRESENTATION INVARIANT:
 
@@ -32,12 +38,15 @@ exception MalformattedBoard
     41|23
 
     v(i,j) is a subset of {1,...,n*n}
+    v(i,j) is not empty
 
     If (a,b) \neq (i,j), v(a,b) = [k] and one
     of the below holds then k \notin v(i,j).
     - (i,j) is in the same box as (a,b)
     - a = i
     - b = j
+
+
 *)
 
 abstype board = Board of int * int list vector
@@ -79,19 +88,31 @@ with
     (* setCell B x y value
        TYPE: board -> int -> int -> int -> board
        PRE:  1 <= x, y, value <= boardside
-       POST: Let B = Board(boardside,v), (a,b) \neq (x,y), B' = setCell B x y value
-             B' = Board(boardside',v') and for brevity
-             let w(i,j) denote Vector.sub(w,i+boardside*j).
+       POST: Let B = Board(boxside,v), (a,b) \neq (x,y),
+                 B' = setCell B x y value and
+                 B' = Board(boardside',v').
 
-             View v(i,j) as the possibilities at position (i,j) in a
-             zero indexed sudoku board. Then the following holds
-             - v(a,b) \setminus v'(a,b) is a set containing only impossibilities at (a,b)
-             - v'(a,b) \subseteq v(a,b)
+             We use the same terminology and notation as in
+             the representation convention.
 
-             If v'(i,j) is found to be contradictive then an exception may be raised.
-       EXAMPLE:
-       EXCEPTIONS:
-       VARIANT:
+             - v(i,j) \setminus v'(i,j) is a set containing
+               only impossibilities at (i,j).
+             - v'(a,b) is a subset or is equal to v(a,b).
+             - If (i,j) is distinct from (x,y) but in the
+               same row, column or box then value is not
+               a member of v(i,j).
+
+             If v'(i,j) is found to be inconsistent then
+             the NotASolution exception is raised
+             exception is raised.
+       EXAMPLE: setCell (emptyBoard 4) 0 0 1 =
+                 Board(2, fromList
+                           [[4],      [1, 2, 3],   [1, 2, 3],   [1, 2, 3],
+                            [1, 2, 3],[1, 2, 3],   [1, 2, 3, 4],[1, 2, 3, 4],
+                            [1, 2, 3],[1, 2, 3, 4],[1, 2, 3, 4],[1, 2, 3, 4],
+                            [1, 2, 3],[1, 2, 3, 4],[1, 2, 3, 4],[1, 2, 3, 4]])
+       EXCEPTIONS: may raise NotASolution.
+       VARIANT: The sum of the lengths of the lists in v.
      *)
     fun setCell (oldbrd as Board (oldbs, oldvec) : board) (x : int) (y : int) (value : int) =
         let
