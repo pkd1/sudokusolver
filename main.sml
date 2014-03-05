@@ -118,13 +118,13 @@ with
         let
             val boardside = getBoardSide oldbrd
             val boxSide = getBoxSide oldbrd
-            fun removeValueFromRowColBlock (index, possibilities_at_i) =
+            fun removeValueFromRowColBlock (index, possibilitiesAti) =
                 let
                     val (xi, yi) = indexToxy boardside index
-                    val block_of_xy = xyToBlock boxSide x y
-                    val block_of_i  = xyToBlock boxSide xi yi
+                    val blockOfxy = xyToBlock boxSide x y
+                    val blockOfi  = xyToBlock boxSide xi yi
                 in
-                    case (xi = x, yi = y, block_of_i = block_of_xy) of
+                    case (xi = x, yi = y, blockOfi = blockOfxy) of
                         (* The cell being updated *)
                         (true,true,_)       => [value]
                         (* Other block, column and row *)
@@ -132,15 +132,15 @@ with
                         (* Not the cell being updated but on a
                              common block, column or row. *)
                       | (_,_,_) => List.filter (fn x => x <> value)
-                                               possibilities_at_i
+                                               possibilitiesAti
                 end
             val newvec = Vector.mapi removeValueFromRowColBlock oldvec
 
             (* Find the new singleton lists. Panic on nil *)
-            fun singleton_coordinates (v: int list vector)
+            fun getValueAndCoordinateOfSingletons (v: int list vector)
               = Vector.foldli
-                    (fn (index,possibilities_at_index,accumulator)
-                        => case (possibilities_at_index,
+                    (fn (index,possibilitiesAtIndex,accumulator)
+                        => case (possibilitiesAtIndex,
                                  index=xyToIndex boardside x y) of
                                (* In case of a singleton,
                                     put the xy-coord and the member
@@ -159,11 +159,10 @@ with
         in
             (* Update all of the changed positions using setCell
                  to propagate the new restrictions. *)
-            List.foldl (fn (((x,y),value_at_xy), brd )
-                           => setCell brd x y value_at_xy)
-
+            List.foldl (fn (((x,y),valueAtxy), brd )
+                           => setCell brd x y valueAtxy)
                        (Board(oldbs, newvec))
-                       (singleton_coordinates newvec)
+                       (getValueAndCoordinateOfSingletons newvec)
         end
 
 
