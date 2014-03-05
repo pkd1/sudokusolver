@@ -2,7 +2,42 @@
 exception MalformattedBoard
 
 (* REPRESENTATION CONVENTION:
+    Let b = Board(n,v).
+    n stands for the length of the side of a box in the sudoku.
+    This means that for
+    - a normal 9x9,  n = 3
+    - a        16x16,n = 4
+    - a        4x4,  n = 2
+    and so on. In general the side of a box is the root of the
+    side of the board. This means that only boards with sides
+    of length n*n is allowed where n is a positive integer.
+
+    v is a vector of length n^4, or boardside^2 where
+    boardside = n^2. For brevity and clarity, let us
+    write Vector.sub(w,i+j*n*n) as w(i,j).
+    v(i,j) represents a set of non-excluded values
+    for the cell (i,j) in the sudoku
+    (using indexes starting at zero) as a list of the
+    non-excluded values.
+
+    If v(i,j) = [k] the cell is considered to be set.
+
    REPRESENTATION INVARIANT:
+
+    Example of boxes in a 4x4 sudoku:
+    12|34
+    34|12
+    -- --
+    23|41
+    41|23
+
+    v(i,j) is a subset of {1,...,n*n}
+
+    If (a,b) \neq (i,j), v(a,b) = [k] and one
+    of the below holds then k \notin v(i,j).
+    - (i,j) is in the same box as (a,b)
+    - a = i
+    - b = j
 *)
 
 abstype board = Board of int * int list vector
