@@ -125,31 +125,43 @@ with
                     val block_of_i  = xyToBlock boxSide xi yi
                 in
                     case (xi = x, yi = y, block_of_i = block_of_xy) of
-                        (true,true,_)       => [value]                  (* The cell being updated *)
-                      | (false,false,false) => Vector.sub(oldvec, index) (* other block, column and row *)
-                      (* not the cell being updated but on a common block, column or row. *)
-                      | (_,_,_) => List.filter (fn x => x <> value) possibilities_at_i
+                        (* The cell being updated *)
+                        (true,true,_)       => [value]
+                        (* Other block, column and row *)
+                      | (false,false,false) => Vector.sub(oldvec, index)
+                        (* Not the cell being updated but on a
+                             common block, column or row. *)
+                      | (_,_,_) => List.filter (fn x => x <> value)
+                                               possibilities_at_i
                 end
             val newvec = Vector.mapi removeValueFromRowColBlock oldvec
 
             (* Find the new singleton lists. Panic on nil *)
             fun singleton_coordinates (v: int list vector)
-              = Vector.foldli (fn (index,possibilities_at_index,accumulator)
-                                  => case (possibilities_at_index,index=xyToIndex boardside x y) of
-                                         (* In case of a singleton, note the xy-coord and the member... *)
-                                         (a::nil,false) => (case Vector.sub(oldvec,index) of
-                                                                b::c::t => (indexToxy boardside index, a)::accumulator
-                                                              | _       => accumulator)
-                                       (* ...and panic if encountering nil. *)
-                                       | (nil,_) => raise NotASolution
+              = Vector.foldli
+                    (fn (index,possibilities_at_index,accumulator)
+                        => case (possibilities_at_index,
+                                 index=xyToIndex boardside x y) of
+                               (* In case of a singleton,
+                                    put the xy-coord and the member
+                                    into the accumulator... *)
+                               (a::nil,false)
+                                 => (case Vector.sub(oldvec,index) of
+                                         b::c::t
+                                           => (indexToxy boardside index, a)
+                                                 ::accumulator
                                        | _ => accumulator)
-                              [] v
+                               (* ...and panic if encountering nil. *)
+                             | (nil,_) => raise NotASolution
+                             | _ => accumulator)
+                    [] v
 
                 fun propagate_at_xy( ((x,y),value_at_xy), brd )
                     = setCell brd x y value_at_xy
 
         in
-            (* Update all of the changed positions using setCell to propagate the new restrictions. *)
+            (* Update all of the changed positions using setCell
+                 to propagate the new restrictions. *)
             List.foldl propagate_at_xy
                        (Board(oldbs, newvec))
                        (singleton_coordinates newvec)
