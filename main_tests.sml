@@ -75,7 +75,18 @@ fun test () =
 
             (15, List.all isSome
                           (List.map findFirstSolution
-                                    (readBoardsFile "puzzlefiles/hard9x9.txt")))
+                                    (readBoardsFile "puzzlefiles/hard9x9.txt"))),
+
+            (16, List.all isSome
+                          (List.map findFirstSolution
+                                    (readBoardsFile "puzzlefiles/hard29x9.txt"))),
+
+            (17, List.all isSome
+                          (List.map findFirstSolution
+                                    (readBoardsFile "puzzlefiles/hard39x9.txt"))),
+            (18, List.all isSome
+                          (List.map findFirstSolution
+                                    (readBoardsFile "puzzlefiles/empty9x9.txt")))
 
         ]
         val allPassed = List.all (fn (_,b) => b) tests
