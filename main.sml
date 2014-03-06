@@ -16,18 +16,30 @@ exception NotASolution
     v is a vector of length n^4, or boardside^2 where
     boardside = n^2. For brevity and clarity, let us
     write Vector.sub(w,i+j*n*n) as w(i,j).
-    v(i,j) represents a set of non-excluded values
-    for the cell (i,j) in the sudoku
+    v(i,j) represents the set of non-excluded values
+    for the cell (i,j) on the sudoku board
     (using indexes starting at zero) as a list of the
-    non-excluded values.
+    non-excluded values. For ease of specification
+    v(i,j) is sometimes regarded as the set it represents
+    Sets are encoded in lists by enumerating each member
+    in increasing.
 
     If v(i,j) = [k] the cell is considered to be set.
     k is said to be an impossibility at (i,j) if
       putting k at (i,j) makes the board impossible
       to solve.
 
-    A board B' = Board (n',v') is said to extend B
-    if v'(i,j) is a subset or equal to v(i,j).
+    Vocabulary:
+       Let B' = Board (n',v') below.
+
+       B' is said to extend B if n=n' and v'(i,j) is a
+       subset or equal to v(i,j) for all (i,j).
+
+       B' is said to be a solution if all v'(i,j) are
+       singletons.
+
+       B' is called inconsistent if it cannot be extended
+       to a solution.
 
    REPRESENTATION INVARIANT:
 
@@ -46,8 +58,6 @@ exception NotASolution
     - (i,j) is in the same box as (a,b)
     - a = i
     - b = j
-
-
 *)
 
 abstype board = Board of int * int list vector
@@ -198,15 +208,15 @@ with
             rev (revBoardToListList [] [] (bs-1) (bs-1))
         end
 
-    (* setCell B x y value
+    (* setCell Board(boxside,v) x y value
        TYPE: board -> int -> int -> int -> board
-       PRE:  1 <= x, y, value <= boardside
-       POST: Let B = Board(boxside,v), (a,b) \neq (x,y),
+       PRE:  1 <= x, y, value <= boxside^2 (* = boardside *)
+       POST: Let (a,b) \neq (x,y),
                  B' = setCell B x y value and
                  B' = Board(boardside',v').
 
-             We use the same terminology and notation as in
-             the representation convention.
+             The terminology and notation as in
+             the representation convention is used.
 
              - v(i,j) \setminus v'(i,j) is a set containing
                only impossibilities at (i,j).
@@ -215,16 +225,14 @@ with
                same row, column or box then value is not
                a member of v(i,j).
 
-             If v'(i,j) is found to be inconsistent then
-             the NotASolution exception is raised
-             exception is raised.
        EXAMPLE: setCell (emptyBoard 4) 0 0 1 =
                  Board(2, fromList
                            [[4],      [1, 2, 3],   [1, 2, 3],   [1, 2, 3],
                             [1, 2, 3],[1, 2, 3],   [1, 2, 3, 4],[1, 2, 3, 4],
                             [1, 2, 3],[1, 2, 3, 4],[1, 2, 3, 4],[1, 2, 3, 4],
                             [1, 2, 3],[1, 2, 3, 4],[1, 2, 3, 4],[1, 2, 3, 4]])
-       EXCEPTIONS: may raise NotASolution.
+       EXCEPTIONS: If v'(i,j) is found to be inconsistent then
+                   the NotASolution exception is raised
        VARIANT: The sum of the lengths of the lists in v.
      *)
     fun setCell (oldbrd as Board (oldbs, oldvec) : board)
@@ -232,6 +240,22 @@ with
         let
             val boardside = getBoardSide oldbrd
             val boxSide = getBoxSide oldbrd
+            (* removeValueFromRowColBlock(index, possibilitiesAti)
+             TYPE: int * int list -> board
+             PRE:  1 <= i <= oldbs^4 (* = boardside^2 *)
+             POST: Let (xi,yi) = indexToxy index
+                   Board(oldbs, v') where
+                   - v'(x,y) = [value]
+                   - if (xi,yi) distinct from (x,y) but is in
+                     the same line, column or row as (x,y)
+                     then v'(xi,yi)
+                             = possibilitiesAti \setminus {value}
+
+                   - if (xi,yi) is not in the same row, column
+                     or box as (x,y) then v'(xi,yi) = possibilitiesAti
+             EXAMPLE: removeValueFromRowColBlock index
+             *)
+
             fun removeValueFromRowColBlock (index, possibilitiesAti) =
                 let
                     val (xi, yi) = indexToxy boardside index
@@ -250,7 +274,25 @@ with
                 end
             val newvec = Vector.mapi removeValueFromRowColBlock oldvec
 
-            (* Find the new singleton lists. Panic on nil *)
+            (* getValueAndCoordinateOfSingletons vec
+             TYPE: int list vector -> (int*int)*int
+             PRE:  The length of vec is oldbs^4 (* = boardside^2 *)
+             POST: Finds all of the cells that have turned into
+                   singletons between oldvec and vec and returns a
+                   list of the (coordinate,value in the
+                   singleton) of those cells.
+             EXAMPLE: Let oldvec be Vector.fromList
+                           [[1], [2], [4],    [3],
+                            [4], [3], [1, 2], [1, 2],
+                            [2], [1], [3],    [4],
+                            [3], [4], [1, 2], [1, 2]])
+                      getValueAndCoordinateOfSingletons
+                        Vector.fromList [[1], [2], [4], [3],
+                                         [4], [3], [1], [2],
+                                         [2], [1], [3], [4],
+                                         [3], [4], [2], [1, 2]])
+                       = [((2,3), 2),((3,1), 2)]
+             *)
             fun getValueAndCoordinateOfSingletons (v: int list vector)
               = Vector.foldli
                     (fn (index,possibilitiesAtIndex,accumulator)
