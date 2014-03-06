@@ -120,32 +120,74 @@ with
                  3|3||4|4
                  3|3||4|4
        EXAMPLE: xyToBlock 2 2 2 = 3
+       EXCEPTION: raises Subscript if x or y not in specified range.
     *)
     fun xyToBlock (boxSide : int) (x : int) (y : int) =
+        if 0 <= x andalso x < boxSide*boxSide andalso
+           0 <= y andalso y < boxSide*boxSide then
         (y div boxSide) * boxSide + x div boxSide
+        else raise Subscript
 
-    (* xyToBlock boardSide x y
+    (* xyToIndex boardSide x y
        TYPE: int -> int -> int -> int
        PRE:  0 <= x < boardSide, 0 <= y < boardSide
        POST: the index in the vector of the cell at (x,y)
        EXAMPLE: xyToIndex 4 2 2 = 10
+       EXCEPTION: raises Subscript if x or y not in specified range.
     *)
     fun xyToIndex (boardside : int) (x : int) (y : int) : int =
         if 0 <= x andalso x < boardside andalso
            0 <= y andalso y < boardside then
             (y * boardside) + x
         else raise Subscript
+
+    (* xyToIndex boardSide index
+       TYPE: int -> int -> int
+       PRE:  0 <= index < boardSide*boardSide
+       POST: the tuple with coords (x,y) corresponding to index of a vector
+             representing a board with board side boardSide.
+       EXAMPLE: indexToxy 4 10 = (2,2)
+       EXCEPTION: raises Subscript if index not in specified range.
+    *)
     fun indexToxy (boardside : int) (index : int) =
         if 0 <= index andalso index < boardside*boardside
         then (index mod boardside, index div boardside)
         else raise Subscript
 
+    (* getCell (Board(boxSide,vec)) x y
+       TYPE: board -> int -> int -> int list
+       PRE:  0 <= x < boxSide^2, 0 <= y < boxSide^2
+       POST: the int list at pos (indexOfxy boxSide^2) in vec.
+       EXAMPLE: getCell (emptyBoard 4) 2 2 = [1,2,3,4]
+       EXCEPTION: raises Subscript if x or y not in specified range.
+    *)
     fun getCell (Board (boxSide, vec) : board) (x : int) (y : int) =
         Vector.sub(vec, xyToIndex (boxSide*boxSide) x y)
 
+    (* boardToListList b
+       TYPE: board -> int list list list
+       PRE:  true
+       POST: b as an int list list list representation.
+       EXAMPLE: boardToListList (emptyBoard 4) =
+          [[[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]],
+           [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]],
+           [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]],
+           [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]]
+    *)
     fun boardToListList b =
         let
             val bs = getBoardSide b
+            (* revBoardToListList b x y
+               TYPE: board -> int -> int -> int list list
+               PRE:  0 <= x < bs, 0 <= y < bs
+               POST: a list of lists of a (splitted at length bs) list of cells
+                     (int lists), traversed backwards from (x,y) to (0,0)
+               EXAMPLE: with bs = 4 and b = emptyBoard 4,
+                  revBoardToListList [] [] 1 2 =
+                   [[[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]],
+                    [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]]
+               EXCEPTION: raises Subscript if x or y not in specified range.
+            *)
             fun revBoardToListList row full 0 0 =
                 (rev ((getCell b 0 0)::row))::full
               | revBoardToListList row full 0 y =
