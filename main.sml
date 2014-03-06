@@ -60,7 +60,7 @@ exception NotASolution
     - b = j
 *)
 
-abstype board = Board of int * int list vector
+abstype board = Board of int * int list Vector.vector
 with
 
     (* emptyBoard boardSide
@@ -293,7 +293,7 @@ with
                                          [3], [4], [2], [1, 2]])
                        = [((2,3), 2),((3,1), 2)]
              *)
-            fun getValueAndCoordinateOfSingletons (v: int list vector)
+            fun getValueAndCoordinateOfSingletons (v: int list Vector.vector)
               = Vector.foldli
                     (fn (index,possibilitiesAtIndex,accumulator)
                         => case (possibilitiesAtIndex,
