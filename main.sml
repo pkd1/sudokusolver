@@ -1,5 +1,6 @@
 
 exception MalformattedBoard
+exception NotASolution
 
 (* REPRESENTATION CONVENTION:
     Let b = Board(n,v).
@@ -51,6 +52,18 @@ exception MalformattedBoard
 
 abstype board = Board of int * int list vector
 with
+
+    (* emptyBoard boardSide
+       TYPE: int -> board
+       PRE:  boardSide has an integer square root.
+       POST: a board with possibilities 1 to boardSide in every cell.
+       EXAMPLE: emptyBoard 4 = Board (2, fromList[[1, 2, 3, 4],
+        [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4],
+        [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4],
+        [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]])
+       EXCEPTIONS: raises:
+        MalformattedBoard - if boardSide does not have an integer square root.
+    *)
     fun emptyBoard (boardSide : int) =
         let
             val sq = trunc (Math.sqrt (real boardSide))
@@ -62,14 +75,61 @@ with
                                                (fn _ => l)))
         end
 
+    (* debug (Board (_,vec))
+       TYPE: board -> int list vector
+       PRE:  true
+       POST: the vector of the board for debug and testing purpuses.
+       EXAMPLE: debug (emptyBoard 4) = fromList[[1, 2, 3, 4],
+        [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4],
+        [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4],
+        [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]
+    *)
     fun debug (Board (_,vec)) = vec (* only used in test suite *)
+
+    (* getBoxSide (Board (bs,_))
+       TYPE: board -> int
+       PRE:  true
+       POST: the box side bs
+       EXAMPLE: getBoxSide (emptyBoard 4) = 2
+    *)
     fun getBoxSide (Board(bs,_)) = bs
+
+    (* getBoardSide (Board (bs,_))
+       TYPE: board -> int
+       PRE:  true
+       POST: the board side (bs*bs)
+       EXAMPLE: getBoardSide (emptyBoard 4) = 4
+    *)
     fun getBoardSide (Board(bs,_)) = bs*bs
+
+    (* getBoardSize (Board (bs,_))
+       TYPE: board -> int
+       PRE:  true
+       POST: the board size bs^4
+       EXAMPLE: getBoardSize (emptyBoard 4) = 16
+    *)
     fun getBoardSize (Board(bs,_)) = let val b = bs*bs in b*b end
 
+    (* xyToBlock boxSide x y
+       TYPE: int -> int -> int -> int
+       PRE:  0 <= x < boxSide^2, 0 <= y < boxSide^2
+       POST: the block of the cell at (x,y), blocks numbered as follows:
+                 1|1||2|2
+                 1|1||2|2
+                 ========
+                 3|3||4|4
+                 3|3||4|4
+       EXAMPLE: xyToBlock 2 2 2 = 3
+    *)
     fun xyToBlock (boxSide : int) (x : int) (y : int) =
         (y div boxSide) * boxSide + x div boxSide
 
+    (* xyToBlock boardSide x y
+       TYPE: int -> int -> int -> int
+       PRE:  0 <= x < boardSide, 0 <= y < boardSide
+       POST: the index in the vector of the cell at (x,y)
+       EXAMPLE: xyToIndex 4 2 2 = 10
+    *)
     fun xyToIndex (boardside : int) (x : int) (y : int) : int =
         if 0 <= x andalso x < boardside andalso
            0 <= y andalso y < boardside then
@@ -95,8 +155,6 @@ with
         in
             rev (revBoardToListList [] [] (bs-1) (bs-1))
         end
-
-    exception NotASolution
 
     (* setCell B x y value
        TYPE: board -> int -> int -> int -> board
