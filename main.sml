@@ -189,13 +189,13 @@ with
                EXCEPTION: raises Subscript if x or y not in specified range.
             *)
             fun revBoardToListList row full 0 0 =
-                (rev ((getCell b 0 0)::row))::full
+                ((getCell b 0 0)::row)::full
               | revBoardToListList row full 0 y =
-                revBoardToListList [] (rev ((getCell b 0 y)::row)::full) (bs-1) (y-1)
+                revBoardToListList [] (((getCell b 0 y)::row)::full) (bs-1) (y-1)
               | revBoardToListList row full x y =
                 revBoardToListList ((getCell b x y)::row) full (x-1) y
         in
-            rev (revBoardToListList [] [] (bs-1) (bs-1))
+            revBoardToListList [] [] (bs-1) (bs-1)
         end
 
     (* setCell B x y value
@@ -421,7 +421,7 @@ fun toFString f b =
         *)
         fun concatWith string func = String.concatWith string o List.map func;
     in
-       concatWith "\n" (concatWith "," f) l
+       "\n"^ (concatWith "\n" (concatWith "," f) l) ^"\n"
     end
 
 val toString = toFString singeltonToString
