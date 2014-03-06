@@ -220,35 +220,6 @@ fun readLines fname =
 fun readNumbersFromLine line
       = List.map Int.fromString (String.fields (fn c => c = #",") line)
 
-
-
-
-
-fun singeltonToString [x] = StringCvt.padLeft #" " 8 (Int.toString x)
-  | singeltonToString _ = "        "
-
-fun listToString pad l = "[" ^ (StringCvt.padLeft #" " (pad*2-1)
-           (String.concatWith "," (List.map Int.toString l))) ^ "]"
-
-fun toFString f b =
-    let
-        val l = boardToListList b
-        fun concatWith string func = String.concatWith string o List.map func;
-    in
-       concatWith "\n" (concatWith "," f) l
-    end
-
-val toString = toFString singeltonToString
-
-val printBoard = print o toString
-
-fun printPos b =
-    let
-        val len = getBoardSide b
-    in
-        (print o toFString (listToString len)) b
-    end
-
 (* readBoard stringlist
    TYPE: string list -> board
    PRE:  stringlist is a string representation of a board where every element
@@ -301,6 +272,78 @@ fun readBoardsFile boardsFile =
                           readBF boards (currentLine::buf) lines
     in
         List.map readBoard (readBF [] [] (rev fileStrings))
+    end
+
+(* singeltonToString l
+   TYPE: int list -> string
+   PRE:  true
+   POST: the value of the singelton as a string padded to length 2 with spaces
+         if l is a singelton, otherwise a string with 2 spaces.
+   EXAMPLE: singeltonToString [2,3,4] = "  ";
+            singeltonToString [4] = " 4";
+            singeltonToString [] = "  ";
+*)
+fun singeltonToString [x] = StringCvt.padLeft #" " 2 (Int.toString x)
+  | singeltonToString _ = "  "
+
+(* listToString pad l
+   TYPE: int -> int list -> string
+   PRE:  true
+   POST: a string representation of l padded to length 2*pad-1 with spaces,
+         surrounded by square brackets.
+   EXAMPLE: listToString 2 [2,3,4] = "[2,3,4]";
+            listToString 3 [4] = "[    4]";
+            listToString 2 [] = "[   ]";
+*)
+fun listToString pad l = "[" ^ (StringCvt.padLeft #" " (pad*2-1)
+           (String.concatWith "," (List.map Int.toString l))) ^ "]"
+
+
+(* toFString f b
+   TYPE: (int list -> string) -> board -> string
+   PRE:  true
+   POST: a string representation of b, with every cell represented by f.
+   EXAMPLE: toFString (fn l => Int.toString (length l)) (emptyBoard 4) =
+            "4,4,4,4\n4,4,4,4\n4,4,4,4\n4,4,4,4";
+*)
+fun toFString f b =
+    let
+        val l = boardToListList b
+
+        (* concatWith s f l
+           TYPE: string -> ('a -> string) -> 'a list -> string
+           PRE:  true
+           POST: a string representation of l, with every element represented
+                 by f, concatenated with s.
+           EXAMPLE: concatWith "." (str o Char.toUpper o hd o explode)
+                               ["Magnetic","resonance","imageing"] =
+                    "M.R.I";
+        *)
+        fun concatWith string func = String.concatWith string o List.map func;
+    in
+       concatWith "\n" (concatWith "," f) l
+    end
+
+val toString = toFString singeltonToString
+
+val printBoard = print o toString
+
+(* printPos b
+   TYPE: board -> unit
+   PRE:  true
+   POST: a string representation of b, with every cell represented by f.
+   EXAMPLE: printPos (readBoard ["1,,2,",",3,,","4,,,",",,,"]);
+   SIDE-EFFECTS: Prints the string representation of b with possibilities.
+   [  1,2,4],[    1,4],[    1,2],[      3]
+   [    1,2],[    1,3],[    1,2],[      4]
+   [    1,4],[    1,4],[      3],[      2]
+   [      3],[      2],[      4],[      1]
+*)
+fun printPos b =
+    let
+        val len = getBoardSide b
+    in
+        (print o toFString (listToString len)) b
     end
 
 (* funktionsnamn argument
