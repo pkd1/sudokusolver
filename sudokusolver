@@ -1,0 +1,6 @@
+#!/bin/bash
+if [ "$1" != "" ]; then
+    poly --script --use ${0%/*}/solve.sml < $1
+else
+    poly --script --use ${0%/*}/solve.sml
+fi

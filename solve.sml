@@ -1,4 +1,3 @@
-#!/usr/bin/env poly --script --use
 
 use "solver";
 
