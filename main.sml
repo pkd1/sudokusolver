@@ -339,12 +339,7 @@ val printBoard = print o toString
    [    1,4],[    1,4],[      3],[      2]
    [      3],[      2],[      4],[      1]
 *)
-fun printPos b =
-    let
-        val len = getBoardSide b
-    in
-        (print o toFString (listToString len)) b
-    end
+fun printPos b = (print o toFString (listToString (getBoardSide b))) b
 
 (* funktionsnamn argument
    TYPE:
