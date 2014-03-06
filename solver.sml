@@ -3,10 +3,15 @@ use "main.sml";
 (* findFirstSolution brd
    TYPE: board -> board option
    PRE:  true
-   POST: If brd is a solvable board return SOME brd'
-         where brd' is a solved board extending brd.
+   POST: See the convention for board for
+         definitions of the vocabulary.
+         If brd can be extended to a solution
+         return SOME brd' where brd' is a solution
+         extending brd.
    EXAMPLE: The following is compatible but not
-            guaranteed by the specification.
+            guaranteed by the specification (there are
+            other solutions that are also allowed by the
+            specification).
             findFirstSolution (readBoard ["1,2, ,3",
                                           " , , , ",
                                           " , , , ",
@@ -72,7 +77,7 @@ fun findFirstSolution(brd: board) : board option =
                                     " , , ,1",
                                     " ,1, , "])
               then the following is compatible with but not
-              guaranteed byt the specification.
+              guaranteed by the specification.
               findFirstAux [2,3,4] =
                  SOME (Board(2,fromList
                                    [[1], [3], [2], [4],
