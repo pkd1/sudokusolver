@@ -17,7 +17,7 @@
 \begin{frame}
   \frametitle{Datastruktur och algoritm}
 \begin{description}
-\item[Datastruktur] $\texttt{abstype board}$ lagrar de möjligheter som finns för cellerna i brädet.
+\item[Datastruktur] $\texttt{abstype board}$ lagrar de möjligheter som finns för cellerna i brädet. Kastar $\texttt{NotASolution}$ om resultatet inte har m\"ojligheter i n\aa gon ruta.
   \begin{description}
   \item[$\texttt{emptyboard}$] Givet $n$,
     initiera ett tomt bräde av storlek $n\times n$.
@@ -27,7 +27,8 @@
 \item[$\texttt{getCell}$] Givet ett bräde $b$, $(x,y)$,
   ge möjligheterna på plats $(x,y)$ i $b$ som en lista.
   \end{description}
-\item[Algoritm] Gissa succesivt på den första rutan som har minimalt antal möjligheter.
+\item[Algoritm] Gissa succesivt på den första rutan som har minimalt
+  antal möjligheter. Implementeras i $\texttt{findFirstSolution : board -> board option}$.
 \end{description}
 \end{frame}
 
@@ -49,7 +50,7 @@
 
 % slajd 4
 \begin{frame}[t]
-  \frametitle{Bjällror och visslor som inte blev implementerade}
+  \frametitle{Bjällror och visselpipor som inte blev implementerade}
 \begin{description}
 \item[Parallellisering] Måste kunna starta ett antal workers, skicka jobb till den minst belastades kö, returnera värden till huvudprocessen.
   \pause
@@ -71,7 +72,11 @@
   % Det är jobbigt att inte ha bra dokumentation till paralleljoxet?
 
   \begin{itemize}
-  \item Tester är asbra och hittar (förhoppningsvis) dumma logiska fel
+  \item Tester är asbra, de hittar logiska fel och regressioner
+  \item På ett tomt $25\times 25$ bräde upptäcker man att $n^4$ växer snabbt
+  \item Rapportskrivande bör påbörjas i tid
+  \item Parallelisering \"ar sv\aa rt utan bra dokumentation
+  \item Ganska nöjda med slutresultatet, ett fungerande program med spartanskt UI.
   \end{itemize}
 \end{frame}
 
