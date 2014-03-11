@@ -1,0 +1,78 @@
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[swedish]{babel}
+
+
+\title{A Naive Sudoku Solver\\\small{PKD group 1}}
+\author{Alexander Andersson \and Alvar Bjerkeng van Keppel}
+\date{\today}
+
+% slajd 0
+\begin{document}
+\begin{frame}[introslide]
+  \titlepage
+\end{frame}
+
+% slajd 1
+\begin{frame}
+  \frametitle{Datastruktur och algoritm}
+\begin{description}
+\item[Datastruktur] $\texttt{abstype board}$ lagrar de möjligheter som finns för cellerna i brädet.
+  \begin{description}
+  \item[$\texttt{emptyboard}$] Givet $n$,
+    initiera ett tomt bräde av storlek $n\times n$.
+  \item[$\texttt{setCell}$] Givet ett bräde $b$, $(x,y)$ och $n$,
+  ge en uppdaterad version av $b$ där möjligheterna på
+  position $(x,y)$ är $\{n\}$ och \emph{uppenbara} omöjligheter utesluts.
+\item[$\texttt{getCell}$] Givet ett bräde $b$, $(x,y)$,
+  ge möjligheterna på plats $(x,y)$ i $b$ som en lista.
+  \end{description}
+\item[Algoritm] Gissa succesivt på den första rutan som har minimalt antal möjligheter.
+\end{description}
+\end{frame}
+
+% slajd 2
+\begin{frame}
+  \frametitle{Hjälpfunktioner och UIet}
+  % nämn något intressant urval av de funktioner
+  % som skyfflar data mellan olika datatyper
+  % och IO.
+
+  % visa hur UIet funkar
+\end{frame}
+
+% slajd 3
+\begin{frame}
+  \frametitle{Prestanda/Demo}
+  % Om du vill visa upp hur kickass programmet är. typ.
+\end{frame}
+
+% slajd 4
+\begin{frame}[t]
+  \frametitle{Bjällror och visslor som inte blev implementerade}
+\begin{description}
+\item[Parallellisering] Måste kunna starta ett antal workers, skicka jobb till den minst belastades kö, returnera värden till huvudprocessen.
+  \pause
+  \begin{description}
+  \item[Concurrent ML] Till SML/NJ. Fanns en del dokumentation, inga exempel inom domänen.
+    \pause
+  \item[PolyML] Ingen direkt dokumentation med genomgångar. Använde locking och waiting.
+    \pause
+  \item[Isabelle ML] Specifikt för matematiska bevis. Bygger på PolyML... bland andra.
+  \end{description}
+\end{description}
+\end{frame}
+
+%slajd 5
+\begin{frame}
+  \frametitle{Problem och slutsater}
+  % Ja, vad tycker vi? allt tar mycket längre tid än vad man tror,
+  % börja med rapporten tidigare?
+  % Det är jobbigt att inte ha bra dokumentation till paralleljoxet?
+
+  \begin{itemize}
+  \item Tester är asbra och hittar (förhoppningsvis) dumma logiska fel
+  \end{itemize}
+\end{frame}
+
+\end{document}
